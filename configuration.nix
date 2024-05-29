@@ -102,6 +102,13 @@ services.nginx.virtualHosts =
           "www.metaverse.nagy135.eu"
         ];
       });
+
+      "drive.nagy135.eu" = (SSL // {
+        locations."/".proxyPass = "http://127.0.0.1:13001/";
+        serverAliases = [
+          "www.drive.nagy135.eu"
+        ];
+      });
     };
 
     system.stateVersion = "23.11";

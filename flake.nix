@@ -7,8 +7,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
-  outputs = inputs@{ self, nixpkgs, home-manager, ... }: {
+  outputs = inputs@{ self, nixpkgs, nixvim, home-manager, ... }: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [

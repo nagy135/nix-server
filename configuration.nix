@@ -1,45 +1,53 @@
-{ pkgs, ... }:
-{
-  imports = [
-    ./hardware-configuration.nix
-    ./networking.nix # generated at runtime by nixos-infect
-
-  ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-
-  zramSwap.enable = true;
-  networking.hostName = "nixos";
-  networking.domain = "";
-  services.openssh.enable = true;
-  programs.zsh.enable = true;
-
-  programs.neovim = {
-    enable = true;
-    vimAlias = true;
+{ pkgs, nixvim, ... }:
+let
+  platform = "aarch64-darwin";
+  nixvimPkg = import ./nixvim { 
+    inherit nixvim;
+    lib = pkgs.lib;
+    pkgs = pkgs.legacyPackages.${platform};
   };
+in
+  {
+    imports = [
+      ./hardware-configuration.nix
+      ./networking.nix # generated at runtime by nixos-infect
 
-  boot.tmp.cleanOnBoot = true;
-  users.users.root.openssh.authorizedKeys.keys = [
-    ''PUBLIC_KEY''
-  ];
-  users.users.infiniter = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" "docker" "video" "podman" ];
-    openssh.authorizedKeys.keys = [ ''PUBLIC_KEY'' ];
-  };
-  environment.systemPackages = with pkgs;
-  [
-    neovim
-    lsd
-    lazygit
+    ];
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-    docker-compose
-    git
-    postgresql
-    docker-client
-  ];
+
+    zramSwap.enable = true;
+    networking.hostName = "nixos";
+    networking.domain = "";
+    services.openssh.enable = true;
+    programs.zsh.enable = true;
+
+    programs.neovim = {
+      enable = true;
+      vimAlias = true;
+    };
+
+    boot.tmp.cleanOnBoot = true;
+    users.users.root.openssh.authorizedKeys.keys = [
+      ''PUBLIC_KEY''
+    ];
+    users.users.infiniter = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "wheel" "docker" "video" "podman" ];
+      openssh.authorizedKeys.keys = [ ''PUBLIC_KEY'' ];
+    };
+    environment.systemPackages = with pkgs;
+    [
+      neovim
+      lsd
+      lazygit
+
+      docker-compose
+      git
+      postgresql
+      docker-client
+    ];
 
 
 # Arion works with Docker, but for NixOS-based containers, you need Podman

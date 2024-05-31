@@ -6,7 +6,6 @@ in
     imports = [
       ./hardware-configuration.nix
       ./networking.nix # generated at runtime by nixos-infect
-      ./nixvim
 
     ];
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -35,7 +34,6 @@ in
     };
     environment.systemPackages = with pkgs;
     [
-      nixvimPkg
       lsd
       lazygit
 

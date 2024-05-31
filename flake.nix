@@ -7,7 +7,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = inputs@{ self, nixpkgs, nixvim, home-manager, ... }: 
+  outputs = inputs@{ self, nixpkgs, home-manager, ... }: 
   {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";

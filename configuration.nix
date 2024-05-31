@@ -1,6 +1,6 @@
 { pkgs, nixvim, ... }:
 let
-  platform = "aarch64-darwin";
+  platform = "x86_64-linux";
   nixvimPkg = import ./nixvim { 
     inherit nixvim;
     lib = pkgs.lib;

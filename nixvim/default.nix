@@ -178,7 +178,7 @@ let
     '';
   };
 in
-  nixvim.legacyPackages."aarch64-darwin".makeNixvim
+  nixvim.nixosModules.nixvim 
   (
     recursiveMerge
     [

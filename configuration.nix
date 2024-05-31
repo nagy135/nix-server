@@ -1,16 +1,12 @@
-{ pkgs, nixvim, ... }:
+{ pkgs, ... }:
 let
   platform = "x86_64-linux";
-  nixvimPkg = import ./nixvim { 
-    inherit nixvim;
-    lib = pkgs.lib;
-    pkgs = pkgs.legacyPackages.${platform};
-  };
 in
   {
     imports = [
       ./hardware-configuration.nix
       ./networking.nix # generated at runtime by nixos-infect
+      ./nixvim
 
     ];
     nix.settings.experimental-features = [ "nix-command" "flakes" ];

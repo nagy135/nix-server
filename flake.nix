@@ -13,12 +13,20 @@
     };
 
   };
-  outputs = inputs@{ self, nixpkgs, nixvim, home-manager, ... }: {
+  outputs = inputs@{ self, nixpkgs, nixvim, home-manager, ... }: 
+  let
+    platform = "x86_64-linux";
+    nixvimPkg = import ./nixvim { 
+      inherit nixvim;
+      lib = nixpkgs.lib;
+      pkgs = nixpkgs.legacyPackages.${platform};
+    };
+  in {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./configuration.nix
-        nixvim.nixosModules.nixvim 
+        nixvimPkg
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;

@@ -39,7 +39,7 @@ in
     };
     environment.systemPackages = with pkgs;
     [
-      neovim
+      nixvimPkg
       lsd
       lazygit
 

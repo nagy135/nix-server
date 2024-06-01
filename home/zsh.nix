@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   functionsScripts = pkgs.writeShellScript "zshfunctions" ''
   copy_chmod_chown(){
@@ -32,6 +32,18 @@ in
         vim = "nvim";
 
       };
+      plugins = [
+        {
+          name = "powerlevel10k";
+          src = pkgs.zsh-powerlevel10k;
+          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+        }
+        {
+          name = "powerlevel10k-config";
+          src = lib.cleanSource ./config;
+          file = "p10k.zsh";
+        }
+      ];
       envExtra = ''
       export HISTFILE=$HOME/.zsh_history
       '';
@@ -51,7 +63,6 @@ in
       setopt nosharehistory
       setopt appendhistory
 
-      source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
 
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
       zstyle ':completion:*' list-colors "$${(s.:.)LS_COLORS}"

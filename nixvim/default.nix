@@ -178,9 +178,9 @@ let
     '';
   };
 in
-  nixvim.legacyPackages."aarch64-darwin".makeNixvim
-  (
-    recursiveMerge
+  {
+
+   config = recursiveMerge
     [
       nixvimConfiguration
       (import ./bufferline.nix)
@@ -199,5 +199,5 @@ in
       (import ./lspsaga.nix)
 
       (import ./ftplugin.nix)
-    ]
-    )
+    ];
+  }

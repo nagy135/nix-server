@@ -6,6 +6,11 @@
       url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    inputs.nixvim = {
+      url = "github:nix-community/nixvim";
+
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs = inputs@{ self, nixpkgs, home-manager, ... }: 
   {
@@ -17,6 +22,8 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          
+          home-manager.extraSpecialArgs = { inherit inputs; };
 
           home-manager.users.infiniter = import ./home;
         }

@@ -15,5 +15,6 @@ in
 
   home.packages = [
     nixvimModule
+    pkgs.zsh-powerlevel10k
   ];
 }

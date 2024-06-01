@@ -1,3 +1,0 @@
-{
-	publicSshKey = ''PUBLIC_KEY'';
-}

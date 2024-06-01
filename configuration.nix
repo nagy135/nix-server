@@ -1,11 +1,12 @@
 { pkgs, ... }:
 let
-  platform = "x86_64-linux";
+  credentials = import credentials.nix;
 in
   {
     imports = [
       ./hardware-configuration.nix
       ./networking.nix # generated at runtime by nixos-infect
+      ./credentials.nix
 
     ];
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -23,14 +24,12 @@ in
     };
 
     boot.tmp.cleanOnBoot = true;
-    users.users.root.openssh.authorizedKeys.keys = [
-      ''PUBLIC_KEY''
-    ];
+    users.users.root.openssh.authorizedKeys.keys = [ credentials.publicSshKey ];
     users.users.infiniter = {
       isNormalUser = true;
       shell = pkgs.zsh;
       extraGroups = [ "wheel" "docker" "video" "podman" ];
-      openssh.authorizedKeys.keys = [ ''PUBLIC_KEY'' ];
+      openssh.authorizedKeys.keys = [ credentials.publicSshKey ];
     };
     environment.systemPackages = with pkgs;
     [

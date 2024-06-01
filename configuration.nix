@@ -65,15 +65,11 @@ services.postgresql = {
   ensureUsers = [
     {
       name = "3dprints";
-      ensurePermissions = {
-        "DATABASE \"3dprints\"" = "ALL PRIVILEGES";
-      };
+      ensureDBOwnership = true;
     }
     {
       name = "dano";
-      ensurePermissions = {
-        "DATABASE \"dano\"" = "ALL PRIVILEGES";
-      };
+      ensureDBOwnership = true;
     }
   ];
 };

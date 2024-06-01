@@ -9,7 +9,6 @@ let
 in
   {
     programs.zsh = {
-      promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
       enable = true;
       syntaxHighlighting.enable = true;
       enableCompletion = true;
@@ -52,6 +51,7 @@ in
       setopt nosharehistory
       setopt appendhistory
 
+      source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
 
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
       zstyle ':completion:*' list-colors "$${(s.:.)LS_COLORS}"

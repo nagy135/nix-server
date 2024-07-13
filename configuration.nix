@@ -37,7 +37,8 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCnmNqABy0voX/rDdThGadpR5ZSF6NWJ2oWaGJvRJWF
     [
       lsd
       lazygit
-
+      bun
+      nodejs
       docker-compose
       git
       postgresql
@@ -120,6 +121,13 @@ services.nginx.virtualHosts =
         locations."/".proxyPass = "http://127.0.0.1:13001/";
         serverAliases = [
           "www.drive.nagy135.eu"
+        ];
+      });
+
+      "warehouse.nagy135.eu" = (SSL // {
+        locations."/".proxyPass = "http://127.0.0.1:13002/";
+        serverAliases = [
+          "www.warehouse.nagy135.eu"
         ];
       });
     };

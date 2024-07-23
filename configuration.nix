@@ -37,6 +37,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCnmNqABy0voX/rDdThGadpR5ZSF6NWJ2oWaGJvRJWF
     [
       lsd
       lazygit
+      z-lua
       bun
       nodejs
       docker-compose

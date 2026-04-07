@@ -2,13 +2,14 @@
 , domain ? "infiniter.tech"
 , basePort ? 4096
 , opencodePkg
+, serverPasswordFile
 , user ? "opencode"
 , group ? "opencode"
 , home ? "/var/lib/opencode"
 , gitUserName ? "OpenCode"
 , gitUserEmail ? "opencode@infiniter.tech"
 }:
-{ config, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 
 let
   mkProject = index: path:
@@ -51,7 +52,7 @@ let
         };
 
         script = ''
-          export OPENCODE_SERVER_PASSWORD="$(< ${config.sops.secrets.opencode-server-password.path})"
+          export OPENCODE_SERVER_PASSWORD="$(< ${serverPasswordFile})"
 
           # Optional future deploy key wiring:
           # export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -i /run/secrets/opencode-deploy-key -o IdentitiesOnly=yes"

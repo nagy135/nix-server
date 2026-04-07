@@ -14,9 +14,9 @@ in
         "/home/infiniter/services/vite-portfolio"
       ];
       opencodePkg = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode;
+      serverPasswordFile = ./secrets/opencode-server-password;
     })
     inputs.home-manager.nixosModules.default
-    inputs.sops-nix.nixosModules.sops
 
   ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -92,7 +92,6 @@ in
     vaultwarden = {
       enable = false;
       dbBackend = "sqlite";
-      environmentFile = config.sops.secrets.pass.path;
 
       config = {
         DATA_FOLDER = "/var/lib/vaultwarden";
@@ -129,33 +128,6 @@ in
   #     local all       all     trust
   #   '';
   #
-  # };
-
-  # Commit the encrypted SOPS file so flake evaluation can access it in pure mode.
-  sops.defaultSopsFile = ./secrets/keys.yaml;
-  sops.age.sshKeyPaths = [ "/root/.ssh/id_ed25519" ];
-  sops.age.keyFile = "/root/.config/sops/age/keys.txt";
-  sops.age.generateKey = true;
-  # sops.secrets.pass = {
-  #   owner = "firefly-iii";
-  #   group = "firefly-iii";
-  #   mode = "0400";
-  # };
-  sops.secrets.pass = {
-    owner = "vaultwarden";
-    group = "vaultwarden";
-    mode = "0400";
-  };
-  sops.secrets.opencode-server-password = {
-    owner = "opencode";
-    group = "opencode";
-    mode = "0400";
-  };
-  # Optional later if OpenCode needs git-over-SSH access:
-  # sops.secrets.opencode-deploy-key = {
-  #   owner = "opencode";
-  #   group = "opencode";
-  #   mode = "0400";
   # };
 
   nixpkgs.overlays = [

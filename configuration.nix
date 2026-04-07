@@ -9,6 +9,12 @@ in
   imports = [
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
+    (import ./modules/opencode-projects.nix {
+      projectPaths = [
+        "/home/infiniter/services/vite-portfolio"
+      ];
+      opencodePkg = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode;
+    })
     inputs.home-manager.nixosModules.default
     inputs.sops-nix.nixosModules.sops
 
@@ -140,6 +146,17 @@ in
     group = "vaultwarden";
     mode = "0400";
   };
+  sops.secrets.opencode-server-password = {
+    owner = "opencode";
+    group = "opencode";
+    mode = "0400";
+  };
+  # Optional later if OpenCode needs git-over-SSH access:
+  # sops.secrets.opencode-deploy-key = {
+  #   owner = "opencode";
+  #   group = "opencode";
+  #   mode = "0400";
+  # };
 
   nixpkgs.overlays = [
     (self: super: {
@@ -246,7 +263,8 @@ security.acme = {
     networking.enableIPv6 = false;
 
 
-services.nginx.enable = true;
+  services.nginx.enable = true;
+
 services.nginx.virtualHosts =
   let
     SSL = {
@@ -341,7 +359,7 @@ services.nginx.virtualHosts =
       "portfolio.infiniter.tech" = (SSL // {
         root = "/var/www/portfolio/";
         locations."/" = { tryFiles = "$uri /index.html"; };
-        serverAliases = [ "www.portfolio.infiniter.tech" "cv.infiniter.tech" "www.cv.infiniter.tech" "infiniter.tech" "www.infiniter.tech"];
+        serverAliases = [ "www.portfolio.infiniter.tech" "infiniter.tech" "www.infiniter.tech" ];
       });
       "gol.infiniter.tech" = (SSL // {
         root = "/var/www/gol/";

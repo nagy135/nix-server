@@ -131,9 +131,8 @@ in
   #
   # };
 
-  # This file is kept outside the flake source snapshot on purpose, so use the
-  # machine-local path instead of a flake-relative path.
-  sops.defaultSopsFile = /etc/nixos/secrets/keys.yaml;
+  # Commit the encrypted SOPS file so flake evaluation can access it in pure mode.
+  sops.defaultSopsFile = ./secrets/keys.yaml;
   sops.age.sshKeyPaths = [ "/root/.ssh/id_ed25519" ];
   sops.age.keyFile = "/root/.config/sops/age/keys.txt";
   sops.age.generateKey = true;

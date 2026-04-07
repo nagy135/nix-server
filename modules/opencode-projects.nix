@@ -3,6 +3,7 @@
 , basePort ? 4096
 , opencodePkg
 , serverPasswordFile
+, createUser ? true
 , user ? "opencode"
 , group ? "opencode"
 , home ? "/var/lib/opencode"
@@ -44,11 +45,12 @@ let
         serviceConfig = {
           Type = "simple";
           User = user;
-          Group = group;
           WorkingDirectory = normalizedPath;
           Restart = "on-failure";
           RestartSec = 5;
           StateDirectory = serviceName;
+        } // lib.optionalAttrs (group != null) {
+          Group = group;
         };
 
         script = ''
@@ -85,6 +87,13 @@ in
 lib.mkMerge (
   [
     {
+      environment.etc."opencode-gitconfig".text = ''
+        [user]
+          name = ${gitUserName}
+          email = ${gitUserEmail}
+      '';
+    }
+    (lib.mkIf createUser {
       users.groups.${group} = {};
 
       users.users.${user} = {
@@ -93,13 +102,7 @@ lib.mkMerge (
         home = home;
         createHome = true;
       };
-
-      environment.etc."opencode-gitconfig".text = ''
-        [user]
-          name = ${gitUserName}
-          email = ${gitUserEmail}
-      '';
-    }
+    })
   ]
   ++ generated
 )

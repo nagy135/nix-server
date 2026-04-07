@@ -15,6 +15,12 @@ in
       ];
       opencodePkg = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode;
       serverPasswordFile = ./secrets/opencode-server-password;
+      createUser = false;
+      user = "infiniter";
+      group = null;
+      home = "/home/infiniter";
+      gitUserName = "infiniter";
+      gitUserEmail = "opencode@infiniter.tech";
     })
     inputs.home-manager.nixosModules.default
 

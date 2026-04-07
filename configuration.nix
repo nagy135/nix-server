@@ -131,8 +131,9 @@ in
   #
   # };
 
-  # Copy secrets/keys.yaml.example to secrets/keys.yaml on each machine.
-  sops.defaultSopsFile = ./secrets/keys.yaml;
+  # This file is kept outside the flake source snapshot on purpose, so use the
+  # machine-local path instead of a flake-relative path.
+  sops.defaultSopsFile = /etc/nixos/secrets/keys.yaml;
   sops.age.sshKeyPaths = [ "/root/.ssh/id_ed25519" ];
   sops.age.keyFile = "/root/.config/sops/age/keys.txt";
   sops.age.generateKey = true;

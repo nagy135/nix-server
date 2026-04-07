@@ -16,6 +16,7 @@ in {
     (import ./modules/opencode-projects.nix {
       projectPaths = [
         "/home/infiniter/services/vite-portfolio"
+        "/home/infiniter/services/shift-distributor"
       ];
       opencodePkg = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode;
       serverPasswordFile = ./secrets/opencode-server-password;

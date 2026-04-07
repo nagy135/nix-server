@@ -20,7 +20,7 @@
     name = lib.last (lib.splitString "/" normalizedPath);
     port = basePort + index;
     serviceName = "opencode-${name}";
-    host = "${name}.${domain}";
+    host = "edit-${name}.${domain}";
   in {
     systemd.services.${serviceName} = {
       description = "OpenCode for ${normalizedPath}";

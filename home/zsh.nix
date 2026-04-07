@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
-let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   functionsScripts = pkgs.writeShellScript "zshfunctions" ''
     fzfvim(){
     # find file in $1, open it with vim and put it into clipboard
@@ -85,9 +88,8 @@ let
     [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
     fi
     }
-    '';
-in
-  {
+  '';
+in {
   home.packages = with pkgs; [
     zsh-powerlevel10k
     atuin
@@ -143,39 +145,38 @@ in
       }
     ];
     envExtra = ''
-            export EDITOR=nvim
-            export HISTFILE=$HOME/.zsh_history
-            export PATH=$PATH:$HOME/.scripts
+      export EDITOR=nvim
+      export HISTFILE=$HOME/.zsh_history
+      export PATH=$PATH:$HOME/.scripts
 
-            export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+      export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
     '';
     initExtra = ''
-                        source ${functionsScripts}
+                  source ${functionsScripts}
 
-            [ -f ~/.zshenv_secret ] && source ~/.zshenv_secret
+      [ -f ~/.zshenv_secret ] && source ~/.zshenv_secret
 
-            export PATH=~/.npm-packages/bin:$PATH
-            export NODE_PATH=~/.npm-packages/lib/node_modules
+      export PATH=~/.npm-packages/bin:$PATH
+      export NODE_PATH=~/.npm-packages/lib/node_modules
 
-                bindkey '^R' history-incremental-search-backward
+          bindkey '^R' history-incremental-search-backward
 
-                bindkey '^P' history-search-backward
-                bindkey '^N' history-search-forward
+          bindkey '^P' history-search-backward
+          bindkey '^N' history-search-forward
 
-                setopt noincappendhistory
-                setopt nosharehistory
-                setopt appendhistory
+          setopt noincappendhistory
+          setopt nosharehistory
+          setopt appendhistory
 
-            zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-            zstyle ':completion:*' list-colors "$${(s.:.)LS_COLORS}"
+      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+      zstyle ':completion:*' list-colors "$${(s.:.)LS_COLORS}"
 
-                autoload -z edit-command-line
-                zle -N edit-command-line
-                bindkey "^E" edit-command-line
+          autoload -z edit-command-line
+          zle -N edit-command-line
+          bindkey "^E" edit-command-line
 
-            # export NVM_DIR="$HOME/.nvm"
-            # [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" # This loads nvm
+      # export NVM_DIR="$HOME/.nvm"
+      # [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" # This loads nvm
     '';
   };
 }
-

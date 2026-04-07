@@ -6,16 +6,30 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-	  url = "github:nix-community/home-manager/release-24.11";
-	  inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager/release-24.11";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs: {
+  outputs = {
+    self,
+    nixpkgs,
+    ...
+  } @ inputs: let
+    platform = "aarch64-darwin";
+    pkgs = nixpkgs.legacyPackages.${platform};
+  in {
+    formatter.${platform} = pkgs.writeShellApplication {
+      name = "nix-fmt";
+      runtimeInputs = [pkgs.alejandra];
+      text = ''
+        exec alejandra .
+      '';
+    };
     # Please replace my-nixos with your hostname
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
+      specialArgs = {inherit inputs;};
       modules = [
         # Import the previous configuration.nix we used,
         # so the old configuration file still takes effect

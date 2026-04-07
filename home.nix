@@ -1,6 +1,8 @@
-{ config, pkgs, ... }:
-
 {
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
     ./home/zsh.nix
   ];
@@ -57,8 +59,6 @@
     EDITOR = "nvim";
   };
 
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
-

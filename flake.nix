@@ -1,33 +1,26 @@
 {
+  description = "A simple NixOS flake";
+
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-
+    # NixOS official package source, using the nixos-25.05 branch here
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixvim = {
-      url = "github:nix-community/nixvim";
-
-      inputs.nixpkgs.follows = "nixpkgs";
+	  url = "github:nix-community/home-manager/release-24.11";
+	  inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = inputs@{ self, nixpkgs, home-manager, ... }: 
-  {
+
+  outputs = { self, nixpkgs, ... }@inputs: {
+    # Please replace my-nixos with your hostname
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = { inherit inputs; };
       modules = [
+        # Import the previous configuration.nix we used,
+        # so the old configuration file still takes effect
         ./configuration.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          
-          home-manager.extraSpecialArgs = { inherit inputs; };
-
-          home-manager.users.infiniter = import ./home;
-        }
-
       ];
     };
   };

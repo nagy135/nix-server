@@ -62,7 +62,7 @@
         # export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -i /run/secrets/opencode-deploy-key -o IdentitiesOnly=yes"
 
         exec ${opencodePkg}/bin/opencode web \
-          --hostname 127.0.0.1 \
+          --hostname 0.0.0.0 \
           --port ${toString port}
       '';
     };
@@ -76,6 +76,8 @@
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Port $server_port;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
         '';

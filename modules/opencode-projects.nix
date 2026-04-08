@@ -15,6 +15,7 @@
   pkgs,
   ...
 }: let
+  serverPassword = lib.removeSuffix "\n" (builtins.readFile serverPasswordFile);
   mkProject = index: path: let
     normalizedPath = lib.removeSuffix "/" path;
     name = lib.last (lib.splitString "/" normalizedPath);
@@ -56,8 +57,6 @@
         };
 
       script = ''
-        export OPENCODE_SERVER_PASSWORD="$(< ${serverPasswordFile})"
-
         # Optional future deploy key wiring:
         # export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh -i /run/secrets/opencode-deploy-key -o IdentitiesOnly=yes"
 
@@ -70,11 +69,15 @@
     services.nginx.virtualHosts.${host} = {
       enableACME = true;
       forceSSL = true;
+      basicAuth = {
+        opencode = serverPassword;
+      };
 
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString port}";
         proxyWebsockets = true;
         extraConfig = ''
+          proxy_set_header Authorization "";
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-Host $host;
           proxy_set_header X-Forwarded-Port $server_port;

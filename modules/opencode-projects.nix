@@ -126,8 +126,8 @@ in
           email.domains = ["*"];
           extraConfig = {
             upstreams = ["static://202"];
-            cookie_domains = [".${domain}"];
-            whitelist_domains = [".${domain}"];
+            "cookie-domain" = ".${domain}";
+            "whitelist-domain" = ".${domain}";
           };
         };
 

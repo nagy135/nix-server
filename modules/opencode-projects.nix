@@ -25,6 +25,8 @@
   # stored secret so a 32-byte base64 value is decoded correctly.
   cookieSecret = builtins.replaceStrings ["+" "/" "="] ["-" "_" ""] (readSecret cookieSecretFile);
   oauth2ProxyAddress = "http://127.0.0.1:4180";
+  opencodeInstructionsPath = "/etc/opencode-service-instructions.md";
+  opencodeConfigPath = "/etc/opencode-service-config.json";
   mkProject = index: path: let
     normalizedPath = lib.removeSuffix "/" path;
     name = lib.last (lib.splitString "/" normalizedPath);
@@ -40,6 +42,7 @@
       environment = {
         HOME = home;
         GIT_CONFIG_GLOBAL = "/etc/opencode-gitconfig";
+        OPENCODE_CONFIG = opencodeConfigPath;
       };
 
       path = with pkgs; [
@@ -157,6 +160,21 @@ in
             name = ${gitUserName}
             email = ${gitUserEmail}
         '';
+
+        environment.etc."opencode-service-instructions.md".text = ''
+          You are editing a live deployed codebase on a NixOS machine.
+
+          After you make code changes, deploy them so the result can be checked in the browser.
+
+          Do not create git commits or push changes unless explicitly asked.
+
+          When asked to commit, create the commit and push it.
+        '';
+
+        environment.etc."opencode-service-config.json".text = builtins.toJSON {
+          "$schema" = "https://opencode.ai/config.json";
+          instructions = [opencodeInstructionsPath];
+        };
       }
       (lib.mkIf createUser {
         users.groups.${group} = {};

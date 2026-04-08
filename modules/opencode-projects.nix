@@ -21,7 +21,9 @@
   readSecret = path: lib.removeSuffix "\n" (builtins.readFile path);
   githubClientID = readSecret githubClientIDFile;
   githubClientSecret = readSecret githubClientSecretFile;
-  cookieSecret = readSecret cookieSecretFile;
+  # oauth2-proxy accepts URL-safe base64 for cookie secrets; normalize the
+  # stored secret so a 32-byte base64 value is decoded correctly.
+  cookieSecret = builtins.replaceStrings ["+" "/" "="] ["-" "_" ""] (readSecret cookieSecretFile);
   oauth2ProxyAddress = "http://127.0.0.1:4180";
   mkProject = index: path: let
     normalizedPath = lib.removeSuffix "/" path;
@@ -87,7 +89,7 @@
           proxy_set_header X-Forwarded-Host $host;
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Auth-Request-Redirect $scheme://$host$escaped_request_uri;
+          proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
         '';
       };
 
@@ -96,7 +98,7 @@
         proxyWebsockets = true;
         extraConfig = ''
           auth_request /oauth2/auth;
-          error_page 401 =302 https://${authDomain}/oauth2/start?rd=$scheme://$host$escaped_request_uri;
+          error_page 401 =302 https://${authDomain}/oauth2/start?rd=$scheme://$host$request_uri;
 
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-Host $host;
@@ -125,7 +127,7 @@ in
           cookie.secret = cookieSecret;
           email.domains = ["*"];
           extraConfig = {
-            upstreams = ["static://202"];
+            upstream = ["static://202"];
             "cookie-domain" = ".${domain}";
             "whitelist-domain" = ".${domain}";
           };

@@ -19,7 +19,6 @@ in {
         "/home/infiniter/services/shift-distributor"
       ];
       opencodePkg = inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode;
-      serverPasswordFile = ./secrets/opencode-server-password;
       createUser = false;
       user = "infiniter";
       group = null;

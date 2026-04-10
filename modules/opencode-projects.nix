@@ -133,6 +133,7 @@ in
             upstream = ["static://202"];
             "cookie-domain" = ".${domain}";
             "whitelist-domain" = ".${domain}";
+            "github-user" = "nagy135";
           };
         };
 

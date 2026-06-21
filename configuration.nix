@@ -75,7 +75,7 @@ in {
       addToSystemPackages = true;
 
       # Enable Discord / messaging adapter dependencies.
-      extraDependencyGroups = ["messaging" "web" "pty"];
+      extraDependencyGroups = ["messaging" "web"];
 
       environmentFiles = [
         "/var/lib/hermes/env"

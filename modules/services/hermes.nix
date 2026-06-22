@@ -1,4 +1,12 @@
-{pkgs, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.hermes-agent;
+  hermesPackage = cfg.package.override {
+    inherit (cfg) extraDependencyGroups extraPythonPackages;
+  };
   ssl = {
     enableACME = true;
     forceSSL = true;
@@ -7,11 +15,8 @@ in {
   services.hermes-agent = {
     enable = true;
 
-    # Run Hermes inside its managed container.
-    container.enable = true;
-
-    # Allow the normal server user to access the shared Hermes state.
-    container.hostUsers = ["infiniter"];
+    # Run Hermes directly as the dedicated `hermes` system user instead of
+    # inside Docker, so it can reach host services/files normally.
 
     # Install the Hermes CLI into the system PATH.
     addToSystemPackages = true;
@@ -46,37 +51,27 @@ in {
   systemd.services.hermes-dashboard = {
     description = "Hermes Agent Dashboard";
     wantedBy = ["multi-user.target"];
-    after = ["hermes-agent.service" "docker.service" "network-online.target"];
+    after = ["hermes-agent.service" "network-online.target"];
     wants = ["network-online.target"];
-    requires = ["hermes-agent.service" "docker.service"];
+    requires = ["hermes-agent.service"];
+
+    environment = {
+      HOME = cfg.stateDir;
+      HERMES_HOME = "${cfg.stateDir}/.hermes";
+      HERMES_MANAGED = "true";
+      MESSAGING_CWD = cfg.workingDirectory;
+    };
 
     script = ''
-      set -euo pipefail
-
-      for _ in $(${pkgs.coreutils}/bin/seq 1 60); do
-        if ${pkgs.docker}/bin/docker inspect -f '{{.State.Running}}' hermes-agent 2>/dev/null | ${pkgs.gnugrep}/bin/grep -q true; then
-          break
-        fi
-        sleep 1
-      done
-
-      if ! ${pkgs.docker}/bin/docker inspect -f '{{.State.Running}}' hermes-agent 2>/dev/null | ${pkgs.gnugrep}/bin/grep -q true; then
-        echo "hermes-agent container is not running" >&2
-        exit 1
-      fi
-
-      exec ${pkgs.docker}/bin/docker exec -i \
-        --user "$(${pkgs.coreutils}/bin/id -u hermes):$(${pkgs.coreutils}/bin/id -g hermes)" \
-        --env HERMES_HOME=/data/.hermes \
-        --env HERMES_MANAGED=true \
-        --env HOME=/home/hermes \
-        --env MESSAGING_CWD=/data/workspace \
-        hermes-agent \
-        /data/current-package/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open
+      exec ${hermesPackage}/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open
     '';
 
     serviceConfig = {
       Type = "simple";
+      User = cfg.user;
+      Group = cfg.group;
+      WorkingDirectory = cfg.workingDirectory;
+      UMask = "0007";
       Restart = "always";
       RestartSec = 5;
     };

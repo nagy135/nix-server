@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -47,6 +48,28 @@ in {
       };
     };
   };
+
+  # Native Hermes is still sandboxed by systemd's ProtectSystem=strict in the
+  # upstream module. Explicitly allow writes to the user's home.
+  systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [
+    "/home/infiniter"
+  ];
+
+  # Give the dedicated `hermes` user POSIX ACL access to /home/infiniter.
+  # The recursive ACL migration is expensive, so run it once. After that,
+  # default ACLs on directories make newly-created files editable by both users.
+  system.activationScripts.hermes-home-access = lib.stringAfter ["users"] ''
+    if [ -d /home/infiniter ]; then
+      mkdir -p ${cfg.stateDir}
+      if [ ! -e ${cfg.stateDir}/.home-acls-initialized ]; then
+        ${pkgs.acl}/bin/setfacl -R -m u:${cfg.user}:rwx /home/infiniter
+        ${pkgs.findutils}/bin/find /home/infiniter -type d -exec ${pkgs.acl}/bin/setfacl -m d:u:${cfg.user}:rwx,d:u:infiniter:rwx {} +
+        touch ${cfg.stateDir}/.home-acls-initialized
+      else
+        ${pkgs.acl}/bin/setfacl -m u:${cfg.user}:rwx,d:u:${cfg.user}:rwx,d:u:infiniter:rwx /home/infiniter
+      fi
+    fi
+  '';
 
   systemd.services.hermes-dashboard = {
     description = "Hermes Agent Dashboard";

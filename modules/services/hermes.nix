@@ -12,6 +12,7 @@
     enableACME = true;
     forceSSL = true;
   };
+  webhookPort = 8644;
 in {
   services.hermes-agent = {
     enable = true;
@@ -40,6 +41,17 @@ in {
         public_url = "https://agent.infiniter.tech";
         basic_auth.username = "infiniter";
       };
+
+      # Webhooks are served by the gateway, not the dashboard.  Keep the
+      # listener private and expose only /webhooks/* through nginx below.
+      platforms.webhook = {
+        enabled = true;
+        extra = {
+          host = "127.0.0.1";
+          port = webhookPort;
+        };
+      };
+
       toolsets = ["all"];
 
       terminal = {
@@ -103,6 +115,16 @@ in {
   services.nginx.virtualHosts."agent.infiniter.tech" =
     ssl
     // {
+      locations."/webhooks/" = {
+        proxyPass = "http://127.0.0.1:${toString webhookPort}";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        '';
+      };
+
       locations."/" = {
         proxyPass = "http://127.0.0.1:9119";
         proxyWebsockets = true;

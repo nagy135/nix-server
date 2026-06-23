@@ -52,6 +52,10 @@ in {
         };
       };
 
+      plugins.enabled = [
+        "web-search-plus"
+      ];
+
       toolsets = ["all"];
 
       terminal = {

@@ -37,6 +37,7 @@ in {
       };
 
       agent.reasoning_effort = "low";
+      compression.codex_gpt55_autoraise = false;
       dashboard = {
         public_url = "https://agent.infiniter.tech";
         basic_auth.username = "infiniter";

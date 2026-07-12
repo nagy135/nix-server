@@ -1,41 +1,42 @@
 {
-  description = "A simple NixOS flake";
+  description = "Raspberry Pi 5 Nextcloud server";
 
   inputs = {
-    # NixOS official package source, using the nixos-25.05 branch here
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    hermes-agent.url = "github:NousResearch/hermes-agent";
-    home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nvf = {
+      url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = {
-    self,
     nixpkgs,
-    hermes-agent,
+    nixos-hardware,
+    nvf,
     ...
-  } @ inputs: let
-    platform = "aarch64-darwin";
-    pkgs = nixpkgs.legacyPackages.${platform};
+  }: let
+    formatterSystems = ["aarch64-darwin" "aarch64-linux"];
   in {
-    formatter.${platform} = pkgs.writeShellApplication {
-      name = "nix-fmt";
-      runtimeInputs = [pkgs.alejandra];
-      text = ''
-        exec alejandra .
-      '';
-    };
-    # Please replace my-nixos with your hostname
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      specialArgs = {inherit inputs;};
+    formatter = nixpkgs.lib.genAttrs formatterSystems (
+      system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+        pkgs.writeShellApplication {
+          name = "nix-fmt";
+          runtimeInputs = [pkgs.alejandra];
+          text = "exec alejandra .";
+        }
+    );
+
+    nixosConfigurations.raspberry-pi = nixpkgs.lib.nixosSystem {
+      system = "aarch64-linux";
+      specialArgs = {inherit nvf;};
       modules = [
-        hermes-agent.nixosModules.default
-        # Import the previous configuration.nix we used,
-        # so the old configuration file still takes effect
+        nixos-hardware.nixosModules.raspberry-pi-5
         ./configuration.nix
       ];
     };

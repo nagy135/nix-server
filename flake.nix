@@ -1,5 +1,5 @@
 {
-  description = "Raspberry Pi 5 Nextcloud server";
+  description = "NixOS server configurations";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -19,7 +19,22 @@
     nvf,
     ...
   }: let
-    formatterSystems = ["aarch64-darwin" "aarch64-linux"];
+    formatterSystems = ["aarch64-darwin" "aarch64-linux" "x86_64-linux"];
+    mkHost = {
+      system,
+      hostName,
+      hardwareModules,
+    }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {inherit nvf;};
+        modules =
+          hardwareModules
+          ++ [
+            ./configuration.nix
+            {networking.hostName = hostName;}
+          ];
+      };
   in {
     formatter = nixpkgs.lib.genAttrs formatterSystems (
       system: let
@@ -32,13 +47,21 @@
         }
     );
 
-    nixosConfigurations.raspberry-pi = nixpkgs.lib.nixosSystem {
-      system = "aarch64-linux";
-      specialArgs = {inherit nvf;};
-      modules = [
-        nixos-hardware.nixosModules.raspberry-pi-5
-        ./configuration.nix
-      ];
+    nixosConfigurations = {
+      nixpi = mkHost {
+        system = "aarch64-linux";
+        hostName = "nixpi";
+        hardwareModules = [
+          nixos-hardware.nixosModules.raspberry-pi-5
+          ./hardware-configuration-nixpi.nix
+        ];
+      };
+
+      hetzner = mkHost {
+        system = "x86_64-linux";
+        hostName = "hetzner";
+        hardwareModules = [./hardware-configuration-hetzner.nix];
+      };
     };
   };
 }

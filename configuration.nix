@@ -1,6 +1,5 @@
 {...}: {
   imports = [
-    ./hardware-configuration.nix
     ./networking.nix
     ./modules/system/base.nix
     ./modules/users.nix

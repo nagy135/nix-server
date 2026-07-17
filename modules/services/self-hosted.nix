@@ -22,7 +22,7 @@ in {
     };
   };
 
-  # Generate the one-time initial admin password on the Pi, never in the Nix store.
+  # Generate the one-time initial admin password on the host, never in the Nix store.
   systemd.services.nextcloud-admin-password = {
     description = "Generate the initial Nextcloud administrator password";
     requiredBy = ["nextcloud-setup.service"];

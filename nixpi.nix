@@ -1,4 +1,6 @@
 {...}: {
+  boot.initrd.systemd.tpm2.enable = false;
+
   hardware.deviceTree.overlays = [
     {
       name = "nixpi-active-cooler";

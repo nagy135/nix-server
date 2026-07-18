@@ -107,6 +107,9 @@ in {
     enable = true;
     syntaxHighlighting.enable = true;
     enableCompletion = true;
+    completionInit = ''
+      autoload -U compinit && compinit -u
+    '';
     autosuggestion.enable = true;
     defaultKeymap = "viins";
     shellAliases = {

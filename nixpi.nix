@@ -4,7 +4,7 @@
   hardware.deviceTree.overlays = [
     {
       name = "nixpi-active-cooler";
-      filter = "bcm2712-rpi-5-b.dtb";
+      filter = "*rpi-5-b.dtb";
       dtsText = ''
         /dts-v1/;
         /plugin/;

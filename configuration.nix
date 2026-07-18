@@ -5,7 +5,7 @@
     ./modules/users.nix
     ./modules/services/self-hosted.nix
     ./modules/services/hermes.nix
-    ./modules/services/netdata.nix
+    ./modules/services/system-status.nix
     ./modules/web/nginx.nix
   ];
 

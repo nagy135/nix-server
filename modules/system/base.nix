@@ -9,7 +9,6 @@ in {
   nix.settings.experimental-features = ["nix-command" "flakes"];
   nixpkgs.config.allowUnfreePredicate = package:
     builtins.elem (lib.getName package) [
-      "netdata"
       "nvim-dap-vscode-js"
       "vscode-js-debug"
     ];

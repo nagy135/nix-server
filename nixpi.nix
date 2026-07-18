@@ -1,7 +1,7 @@
 {...}: {
   boot.initrd.systemd.tpm2.enable = false;
 
-  services.infiniter.netdata.enable = true;
+  services.infiniter.systemStatus.enable = true;
 
   hardware.deviceTree.overlays = [
     {

@@ -6,9 +6,9 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
-    virtualHosts."drive.infiniter.tech" = {
-      enableACME = true;
-      forceSSL = true;
-    };
+    # virtualHosts."drive.infiniter.tech" = {
+    #   enableACME = true;
+    #   forceSSL = true;
+    # };
   };
 }

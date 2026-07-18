@@ -21,6 +21,7 @@ in {
 
   boot.tmp.cleanOnBoot = true;
   zramSwap.enable = true;
+  virtualisation.docker.enable = true;
   services.openssh = {
     enable = true;
     settings = {

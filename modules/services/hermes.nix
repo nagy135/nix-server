@@ -41,7 +41,10 @@ in {
       compression.codex_gpt55_autoraise = false;
       dashboard = {
         public_url = "https://${hermesDomain}";
-        basic_auth.username = "infiniter";
+        basic_auth = {
+          username = "infiniter";
+          password_hash = "scrypt$16384$8$1$C/u7+bh7f40WrtPCxOH4Ag==$46xRc87TnVcjUrlsRitzvCf7h5WRMPIEMExDqFwGtUQ=";
+        };
       };
 
       # Webhooks are served by the gateway, not the dashboard.  Keep the
@@ -66,6 +69,8 @@ in {
       };
     };
   };
+
+  users.users.infiniter.extraGroups = [cfg.group];
 
   # Native Hermes is still sandboxed by systemd's ProtectSystem=strict in the
   # upstream module. Explicitly allow writes to the user's home.

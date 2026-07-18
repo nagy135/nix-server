@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,6 +18,7 @@
   };
 
   outputs = {
+    home-manager,
     nixpkgs,
     nixos-hardware,
     nvf,
@@ -31,8 +36,16 @@
         modules =
           hardwareModules
           ++ [
+            home-manager.nixosModules.home-manager
             ./configuration.nix
-            {networking.hostName = hostName;}
+            {
+              networking.hostName = hostName;
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.infiniter = import ./home.nix;
+              };
+            }
           ];
       };
   in {

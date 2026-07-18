@@ -7,6 +7,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,6 +23,7 @@
 
   outputs = {
     home-manager,
+    hermes-agent,
     nixpkgs,
     nixos-hardware,
     nvf,
@@ -38,6 +43,7 @@
           hardwareModules
           ++ [
             home-manager.nixosModules.home-manager
+            hermes-agent.nixosModules.default
             ./configuration.nix
             {
               networking.hostName = hostName;

@@ -28,11 +28,12 @@
     mkHost = {
       system,
       hostName,
+      hermesDomain,
       hardwareModules,
     }:
       nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = {inherit nvf;};
+        specialArgs = {inherit hermesDomain nvf;};
         modules =
           hardwareModules
           ++ [
@@ -64,6 +65,7 @@
       nixpi = mkHost {
         system = "aarch64-linux";
         hostName = "nixpi";
+        hermesDomain = "pi.infiniter.tech";
         hardwareModules = [
           nixos-hardware.nixosModules.raspberry-pi-5
           ./hardware-configuration-nixpi.nix
@@ -74,6 +76,7 @@
       hetzner = mkHost {
         system = "x86_64-linux";
         hostName = "hetzner";
+        hermesDomain = "agent.infiniter.tech";
         hardwareModules = [./hardware-configuration-hetzner.nix];
       };
     };

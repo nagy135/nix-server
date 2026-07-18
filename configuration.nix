@@ -4,6 +4,7 @@
     ./modules/system/base.nix
     ./modules/users.nix
     ./modules/services/self-hosted.nix
+    ./modules/services/hermes.nix
     ./modules/web/nginx.nix
   ];
 

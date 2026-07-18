@@ -1,5 +1,6 @@
 {
   config,
+  hermesDomain,
   lib,
   pkgs,
   ...
@@ -39,7 +40,7 @@ in {
       agent.reasoning_effort = "low";
       compression.codex_gpt55_autoraise = false;
       dashboard = {
-        public_url = "https://agent.infiniter.tech";
+        public_url = "https://${hermesDomain}";
         basic_auth.username = "infiniter";
       };
 
@@ -117,7 +118,7 @@ in {
     };
   };
 
-  services.nginx.virtualHosts."agent.infiniter.tech" =
+  services.nginx.virtualHosts.${hermesDomain} =
     ssl
     // {
       locations."/webhooks/" = {
@@ -141,7 +142,7 @@ in {
         '';
       };
       serverAliases = [
-        "www.agent.infiniter.tech"
+        "www.${hermesDomain}"
       ];
     };
 }

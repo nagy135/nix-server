@@ -37,7 +37,7 @@
         targets = [
           {
             datasource.uid = "prometheus";
-            expr = ''100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[$__rate_interval])) * 100)'';
+            expr = ''100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)'';
             legendFormat = "CPU";
           }
         ];
@@ -146,12 +146,12 @@
         targets = [
           {
             datasource.uid = "prometheus";
-            expr = "sum(rate(node_disk_read_bytes_total[$__rate_interval]))";
+            expr = "sum(rate(node_disk_read_bytes_total[5m]))";
             legendFormat = "read";
           }
           {
             datasource.uid = "prometheus";
-            expr = "sum(rate(node_disk_written_bytes_total[$__rate_interval]))";
+            expr = "sum(rate(node_disk_written_bytes_total[5m]))";
             legendFormat = "write";
           }
         ];
@@ -170,12 +170,12 @@
         targets = [
           {
             datasource.uid = "prometheus";
-            expr = ''sum(rate(node_network_receive_bytes_total{device!~"lo|veth.*|br.*|docker.*"}[$__rate_interval]))'';
+            expr = ''sum(rate(node_network_receive_bytes_total{device!~"lo|veth.*|br.*|docker.*"}[5m]))'';
             legendFormat = "receive";
           }
           {
             datasource.uid = "prometheus";
-            expr = ''sum(rate(node_network_transmit_bytes_total{device!~"lo|veth.*|br.*|docker.*"}[$__rate_interval]))'';
+            expr = ''sum(rate(node_network_transmit_bytes_total{device!~"lo|veth.*|br.*|docker.*"}[5m]))'';
             legendFormat = "transmit";
           }
         ];
@@ -190,6 +190,7 @@ in {
       enable = true;
       listenAddress = "127.0.0.1";
       retentionTime = "15d";
+      globalConfig.scrape_interval = "15s";
 
       exporters.node = {
         enable = true;

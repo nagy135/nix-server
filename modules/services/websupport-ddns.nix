@@ -24,7 +24,7 @@
 
       api="https://rest.websupport.sk"
       zone=${lib.escapeShellArg cfg.zone}
-      current_ip="$(curl -fsS --max-time 20 ${lib.escapeShellArg cfg.ipv4Url})"
+      current_ip="$(curl -4 -fsS --max-time 20 ${lib.escapeShellArg cfg.ipv4Url})"
 
       if ! grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' <<< "$current_ip"; then
         echo "Invalid public IPv4 address: $current_ip" >&2
@@ -127,7 +127,7 @@ in {
 
     ipv4Url = lib.mkOption {
       type = lib.types.str;
-      default = "https://ifconfig.me/ip";
+      default = "https://api.ipify.org";
       description = "URL used to discover the current public IPv4 address.";
     };
   };

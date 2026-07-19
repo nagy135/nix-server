@@ -1,7 +1,18 @@
 {...}: {
+  imports = [./modules/services/websupport-ddns.nix];
+
   boot.initrd.systemd.tpm2.enable = false;
 
   services.infiniter.systemStatus.enable = true;
+
+  services.infiniter.websupportDDNS = {
+    enable = true;
+    zone = "infiniter.tech";
+    records = [
+      "bread"
+      "pi-status"
+    ];
+  };
 
   hardware.deviceTree.overlays = [
     {

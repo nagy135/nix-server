@@ -34,6 +34,13 @@ in {
     lsd
     ripgrep
     git
+    btop
+    htop
+    dust
+    ncdu
+    jq
+    lazygit
+    nh
     neovimPackage
   ];
 

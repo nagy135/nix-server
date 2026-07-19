@@ -157,6 +157,35 @@
         ];
       }
       {
+        id = 8;
+        title = "Current Storage Usage";
+        type = "stat";
+        gridPos = {
+          h = 6;
+          w = 12;
+          x = 0;
+          y = 24;
+        };
+        fieldConfig.defaults.unit = "bytes";
+        options = {
+          colorMode = "value";
+          graphMode = "none";
+          reduceOptions.calcs = ["lastNotNull"];
+        };
+        targets = [
+          {
+            datasource.uid = "prometheus";
+            expr = ''node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|ramfs|overlay"} - node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|ramfs|overlay"}'';
+            legendFormat = "used";
+          }
+          {
+            datasource.uid = "prometheus";
+            expr = ''node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|ramfs|overlay"}'';
+            legendFormat = "total";
+          }
+        ];
+      }
+      {
         id = 7;
         title = "Network";
         type = "timeseries";

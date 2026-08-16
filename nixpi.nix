@@ -11,6 +11,7 @@
     records = [
       "bread"
       "fit"
+      "fit-api"
       "pi-status"
     ];
   };

@@ -30,6 +30,15 @@
       };
     };
 
+    virtualHosts."fit-api.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:18080";
+      };
+    };
+
     # virtualHosts."drive.infiniter.tech" = {
     #   enableACME = true;
     #   forceSSL = true;

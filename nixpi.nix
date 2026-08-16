@@ -10,6 +10,7 @@
     zone = "infiniter.tech";
     records = [
       "bread"
+      "fit"
       "pi-status"
     ];
   };

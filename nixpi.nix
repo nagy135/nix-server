@@ -1,40 +1,34 @@
-{pkgs, t3code, codex, ...}: let
-  # Public T3 Connect configuration shipped by the official t3 0.0.40 release.
-  t3ConnectEnvironment = {
-    T3CODE_RELAY_URL = "https://relay.t3.codes";
-    T3CODE_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsudDMuY29kZXMk";
-    T3CODE_CLERK_CLI_OAUTH_CLIENT_ID = "hzxSgY2cH10sDU2r";
-    T3CODE_CLOUDFLARED_PATH = "${pkgs.cloudflared}/bin/cloudflared";
-  };
-in {
+{pkgs, t3code, codex, ...}: {
   imports = [./modules/services/websupport-ddns.nix];
 
+  # Use the existing OpenSSH service over Tailscale; enroll interactively once
+  # with `sudo tailscale up --netfilter-mode=off`. No auth keys belong here.
+  services.tailscale = {
+    enable = true;
+    openFirewall = false;
+    useRoutingFeatures = "none";
+    # Keep NixOS in charge of filtering; SSH is already allowed. Tailscale's
+    # default netfilter mode otherwise accepts all traffic on tailscale0.
+    extraSetFlags = ["--netfilter-mode=off" "--ssh=false" "--accept-routes=false"];
+  };
+
   environment.systemPackages = [t3code codex];
-  environment.variables = t3ConnectEnvironment;
 
   systemd.services.t3code = {
     description = "T3 Code server";
     wantedBy = ["multi-user.target"];
     wants = ["network-online.target"];
     after = ["network-online.target"];
-    environment = t3ConnectEnvironment // {HOME = "/home/infiniter";};
+    environment.HOME = "/home/infiniter";
     path = [pkgs.openssh "/run/current-system/sw" "/etc/profiles/per-user/infiniter"];
     serviceConfig = {
       User = "infiniter";
       WorkingDirectory = "/home/infiniter";
+      # The Mac connects through an SSH forward over Tailscale.
       ExecStart = "${t3code}/bin/t3 serve --host 127.0.0.1 --port 3773";
       Restart = "on-failure";
       RestartSec = 5;
       UMask = "0077";
-    };
-  };
-
-  services.nginx.virtualHosts."t3code.infiniter.tech" = {
-    enableACME = true;
-    forceSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:3773";
-      proxyWebsockets = true;
     };
   };
 
@@ -50,7 +44,6 @@ in {
       "fit"
       "fit-api"
       "pi-status"
-      "t3code"
     ];
   };
 

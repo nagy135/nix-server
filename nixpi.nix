@@ -1,5 +1,24 @@
-{...}: {
+{pkgs, ...}: {
   imports = [./modules/services/websupport-ddns.nix];
+
+  environment.systemPackages = [pkgs.t3code];
+
+  systemd.services.t3code = {
+    description = "T3 Code server";
+    wantedBy = ["multi-user.target"];
+    wants = ["network-online.target"];
+    after = ["network-online.target"];
+    environment.HOME = "/home/infiniter";
+    path = [pkgs.openssh "/run/current-system/sw" "/etc/profiles/per-user/infiniter"];
+    serviceConfig = {
+      User = "infiniter";
+      WorkingDirectory = "/home/infiniter";
+      ExecStart = "${pkgs.t3code}/bin/t3 serve --host 127.0.0.1 --port 3773";
+      Restart = "on-failure";
+      RestartSec = 5;
+      UMask = "0077";
+    };
+  };
 
   boot.initrd.systemd.tpm2.enable = false;
 

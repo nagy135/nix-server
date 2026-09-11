@@ -20,6 +20,15 @@
     };
   };
 
+  services.nginx.virtualHosts."t3code.infiniter.tech" = {
+    enableACME = true;
+    forceSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:3773";
+      proxyWebsockets = true;
+    };
+  };
+
   boot.initrd.systemd.tpm2.enable = false;
 
   services.infiniter.systemStatus.enable = true;
@@ -32,6 +41,7 @@
       "fit"
       "fit-api"
       "pi-status"
+      "t3code"
     ];
   };
 

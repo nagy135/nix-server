@@ -9,7 +9,7 @@
 in {
   imports = [./modules/services/websupport-ddns.nix];
 
-  environment.systemPackages = [t3code];
+  environment.systemPackages = [t3code pkgs.codex];
   environment.variables = t3ConnectEnvironment;
 
   systemd.services.t3code = {

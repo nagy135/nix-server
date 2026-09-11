@@ -41,6 +41,7 @@ in {
     jq
     lazygit
     nh
+    nodejs
     neovimPackage
   ];
 

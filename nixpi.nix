@@ -1,4 +1,4 @@
-{pkgs, t3code, ...}: let
+{pkgs, t3code, codex, ...}: let
   # Public T3 Connect configuration shipped by the official t3 0.0.40 release.
   t3ConnectEnvironment = {
     T3CODE_RELAY_URL = "https://relay.t3.codes";
@@ -9,7 +9,7 @@
 in {
   imports = [./modules/services/websupport-ddns.nix];
 
-  environment.systemPackages = [t3code pkgs.codex];
+  environment.systemPackages = [t3code codex];
   environment.variables = t3ConnectEnvironment;
 
   systemd.services.t3code = {

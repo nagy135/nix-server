@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # Update T3 Code independently so its protocol matches the desktop client.
+    # Update T3 Code and Codex independently of the base system.
     t3code-nixpkgs.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -44,6 +44,7 @@
         specialArgs = {
           inherit hermesDomain nvf;
           t3code = t3code-nixpkgs.legacyPackages.${system}.t3code;
+          codex = t3code-nixpkgs.legacyPackages.${system}.codex;
         };
         modules =
           hardwareModules

@@ -1,7 +1,7 @@
-{pkgs, ...}: {
+{pkgs, t3code, ...}: {
   imports = [./modules/services/websupport-ddns.nix];
 
-  environment.systemPackages = [pkgs.t3code];
+  environment.systemPackages = [t3code];
 
   systemd.services.t3code = {
     description = "T3 Code server";
@@ -13,7 +13,7 @@
     serviceConfig = {
       User = "infiniter";
       WorkingDirectory = "/home/infiniter";
-      ExecStart = "${pkgs.t3code}/bin/t3 serve --host 127.0.0.1 --port 3773";
+      ExecStart = "${t3code}/bin/t3 serve --host 127.0.0.1 --port 3773";
       Restart = "on-failure";
       RestartSec = 5;
       UMask = "0077";

@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Update T3 Code independently so its protocol matches the desktop client.
+    t3code-nixpkgs.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,6 +27,7 @@
     home-manager,
     hermes-agent,
     nixpkgs,
+    t3code-nixpkgs,
     nixos-hardware,
     nvf,
     ...
@@ -38,7 +41,10 @@
     }:
       nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = {inherit hermesDomain nvf;};
+        specialArgs = {
+          inherit hermesDomain nvf;
+          t3code = t3code-nixpkgs.legacyPackages.${system}.t3code;
+        };
         modules =
           hardwareModules
           ++ [

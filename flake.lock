@@ -232,7 +232,24 @@
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "nvf": "nvf"
+        "nvf": "nvf",
+        "t3code-nixpkgs": "t3code-nixpkgs"
+      }
+    },
+    "t3code-nixpkgs": {
+      "locked": {
+        "lastModified": 1789151120,
+        "narHash": "sha256-4S6uyuVC4vbmAxtkz8mdKdku3364PC+F3WN6yIVXkPM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7c0add62dee3093a2947478e06b5f37161bbf23b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "uv2nix": {

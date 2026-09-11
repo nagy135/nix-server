@@ -1,4 +1,4 @@
-{pkgs, t3code, codex, ...}: {
+{pkgs, t3code, codex, claude-code, ...}: {
   imports = [./modules/services/websupport-ddns.nix];
 
   # Use the existing OpenSSH service over Tailscale; enroll interactively once
@@ -12,7 +12,7 @@
     extraSetFlags = ["--netfilter-mode=off" "--ssh=false" "--accept-routes=false"];
   };
 
-  environment.systemPackages = [t3code codex];
+  environment.systemPackages = [t3code codex claude-code];
 
   systemd.services.t3code = {
     description = "T3 Code server";

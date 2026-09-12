@@ -54,6 +54,16 @@ The script evaluates all three complete system derivations and the Zero SD
 image derivation. It neither builds nor activates systems. Keep `flake.lock`
 committed; update inputs deliberately rather than during repository cleanup.
 
+Before changing Hetzner networking, also run on a NixOS machine:
+
+```sh
+sudo bash scripts/check-hetzner-network.sh
+```
+
+This executes its generated interface setup in private network and mount
+namespaces with IPv6 disabled and verifies the IPv4 default route. The host's
+interfaces and runtime network files are untouched.
+
 ## Layout
 
 - `hosts/<name>/`: host configuration, hardware, networking, and web routes.
@@ -68,6 +78,8 @@ Hetzner keeps its original `24.11` state version, Pi 5 keeps `25.11`, and the
 Zero keeps `26.05`. The Zero intentionally omits the larger servers' services.
 Hetzner's disk and static network settings were recovered from the previous
 `master` and matched against `91.99.204.136` over read-only SSH on 2026-09-12.
+The off-subnet IPv4 gateway is explicitly assigned to `eth0`; IPv6 routes are
+omitted because the host disables IPv6.
 Its configured hostname is now `hetzner` (the running server still uses `nixos`
 until a future activation).
 

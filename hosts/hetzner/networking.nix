@@ -1,13 +1,12 @@
 {lib, ...}: {
-  # This file was populated at runtime with the networking
-  # details gathered from the active system.
+  # Hetzner routes the public /32 through an off-subnet gateway. Associate it
+  # with eth0 explicitly so the interface service installs the default route.
   networking = {
     nameservers = [
       "8.8.8.8"
     ];
-    defaultGateway = "172.31.1.1";
-    defaultGateway6 = {
-      address = "fe80::1";
+    defaultGateway = {
+      address = "172.31.1.1";
       interface = "eth0";
     };
     dhcpcd.enable = false;
@@ -20,26 +19,10 @@
             prefixLength = 32;
           }
         ];
-        ipv6.addresses = [
-          {
-            address = "2a01:4f8:c0c:9d54::1";
-            prefixLength = 64;
-          }
-          {
-            address = "fe80::9000:6ff:fedf:ae47";
-            prefixLength = 64;
-          }
-        ];
         ipv4.routes = [
           {
             address = "172.31.1.1";
             prefixLength = 32;
-          }
-        ];
-        ipv6.routes = [
-          {
-            address = "fe80::1";
-            prefixLength = 128;
           }
         ];
       };

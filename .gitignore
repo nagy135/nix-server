@@ -1,1 +1,4 @@
 /secrets/mail-passwords.yaml
+/result*
+/artifacts/
+/wifi_credentials

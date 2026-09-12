@@ -38,11 +38,12 @@ and save it in that repository's ignored `.env.production.local` alongside
 `CONVEX_SELF_HOSTED_URL=https://fitness-ai.infiniter.tech`. Treat it as a secret.
 
 ```sh
-CONVEX_ENV_FILE=.env.production.local nix develop -c ./scripts/convex-self-hosted.sh deploy -y
+CONVEX_ENV_FILE=.env.production.local nix develop -c ./scripts/convex-self-hosted.sh deploy
 ```
 
-Configure server-side `BETTER_AUTH_SECRET`, `CONVEX_SITE_URL` (the auth endpoint),
-`AI_PROVIDER`, `AI_MODEL`, and `OPENROUTER_API_KEY` through that same wrapper.
+Configure server-side `BETTER_AUTH_SECRET`, `AI_PROVIDER`, `AI_MODEL`, and
+`OPENROUTER_API_KEY` through that same wrapper. Convex supplies `CONVEX_SITE_URL`
+from the container's `CONVEX_SITE_ORIGIN` automatically.
 The APK uses the two public endpoints through its EAS preview environment.
 
 Back up the Convex data and instance credentials together before upgrades. Do

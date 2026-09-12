@@ -15,13 +15,30 @@ def main():
     p.add_argument('--output', type=pathlib.Path, required=True)
     p.add_argument('--script', type=pathlib.Path, default=pathlib.Path(__file__).with_name('nixzero-boot.cmd'))
     args = p.parse_args()
-    values = {}
+    entries = {}
+    default = None
+    current = None
     for line in args.extlinux.read_text().splitlines():
         fields = line.strip().split(None, 1)
-        if len(fields) == 2 and fields[0] in ('LINUX', 'FDTDIR', 'APPEND'):
-            if fields[0] in values:
-                p.error('Expected one boot entry; select the intended entry first.')
-            values[fields[0]] = fields[1]
+        if len(fields) != 2:
+            continue
+        name, value = fields
+        if name == 'DEFAULT':
+            default = value
+        elif name == 'LABEL':
+            current = value
+            if current in entries:
+                p.error('Duplicate boot entry label.')
+            entries[current] = {}
+        elif current is not None and name in ('LINUX', 'FDTDIR', 'APPEND'):
+            if name in entries[current]:
+                p.error('Duplicate field in boot entry.')
+            entries[current][name] = value
+    if default is None and len(entries) == 1:
+        default = next(iter(entries))
+    if default not in entries:
+        p.error('Cannot identify the default extlinux boot entry.')
+    values = entries[default]
     if set(values) != {'LINUX', 'FDTDIR', 'APPEND'}:
         p.error('Missing LINUX, FDTDIR or APPEND in extlinux configuration.')
     for name in ('LINUX', 'FDTDIR'):

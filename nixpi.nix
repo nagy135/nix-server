@@ -1,6 +1,11 @@
 {pkgs, t3code, codex, claude-code, ...}: {
   imports = [./modules/services/websupport-ddns.nix];
 
+  # Dedicated Zero build key: Nix store protocol only, without shell access.
+  users.users.root.openssh.authorizedKeys.keys = [
+    ''restrict,command="/run/current-system/sw/bin/nix-daemon --stdio" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILjIxy5FM6spzJ3engHa6k6KwVRlM5p0hJAmONtdJEi+ nixzero Nix build worker''
+  ];
+
   # Use the existing OpenSSH service over Tailscale; enroll interactively once
   # with `sudo tailscale up --netfilter-mode=off`. No auth keys belong here.
   services.tailscale = {

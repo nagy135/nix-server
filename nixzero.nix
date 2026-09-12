@@ -11,6 +11,7 @@ in {
     (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
     (modulesPath + "/profiles/minimal.nix")
     ./modules/nixzero-boot-diagnostics.nix
+    ./modules/nixzero-updates.nix
   ];
 
   # The generic image supplies Zero 2 W firmware, U-Boot and extlinux.
@@ -107,10 +108,32 @@ in {
   };
 
   zramSwap.enable = true;
+  # Evaluation happens on the Zero even with a remote build worker. Give the
+  # 512 MB board disk-backed swap for evaluating the repository's flake.
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 2048;
+    }
+  ];
   services.journald.extraConfig = "SystemMaxUse=64M";
+  nix.distributedBuilds = true;
+  programs.ssh.knownHosts."nixpi.tail6650cb.ts.net".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII2SIZwh/go5ExVFdABBVwXvulYb1YTW7+Sg1r+AWASA";
+  nix.buildMachines = [
+    {
+      hostName = "nixpi.tail6650cb.ts.net";
+      protocol = "ssh-ng";
+      sshUser = "root";
+      sshKey = "/root/.ssh/nixzero-builder";
+      system = "aarch64-linux";
+      maxJobs = 2;
+      supportedFeatures = ["big-parallel"];
+    }
+  ];
   nix.settings = {
     experimental-features = ["nix-command" "flakes"];
-    max-jobs = 1;
+    builders-use-substitutes = true;
+    max-jobs = 0;
     cores = 1;
   };
   environment.systemPackages = with pkgs; [gitMinimal vim htop];

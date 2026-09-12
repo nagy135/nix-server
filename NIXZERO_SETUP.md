@@ -94,9 +94,9 @@ a bundle from that image's single-entry `extlinux.conf` and a newly built
 `system.build.initialRamdisk`. Copy its `uboot.env`, `nixzero-boot.scr`, and
 `nixzero-initrd` onto `FIRMWARE`. Removing `uboot.env` restores the stock extlinux
 boot path. This method preserves the Linux partition and Wi-Fi profile.
-The diagnostic environment names a specific kernel and system generation;
-regenerate the bundle after changing generations, or remove `uboot.env` to
-use the normal extlinux generation selection once boot troubleshooting is done.
+Normal NixOS rebuilds refresh the diagnostic environment and initrd for the
+selected generation. The installer reads the default entry from extlinux, even
+when older generations are also present.
 
 Eject the card using Finder, put it into the Zero 2 W, and power it on. Allow a
 few minutes for the first boot and store registration, then connect from the Mac:
@@ -124,9 +124,28 @@ Then, from the Mac:
 ssh infiniter@nixzero.tail6650cb.ts.net
 ```
 
-Future system builds should run on nixpi, given nixzero's limited RAM. Preserve
-the `nixzero` host configuration, the SD image filesystem labels, and the runtime
-Wi-Fi profile when deploying updates.
+## Update from nixzero
+
+The repository is checked out at `/etc/nixos`, tracking `feat/raspberry_pi`.
+From a root shell (`sudo -i`), use the standard commands:
+
+```sh
+cd /etc/nixos
+git pull
+nixos-rebuild switch --flake /etc/nixos
+```
+
+NixOS selects `nixosConfigurations.nixzero` using the hostname. Evaluation and
+activation run on the Zero; Nix sends builds to `nixpi` over Tailscale. The Zero
+has a 2 GiB swap file for evaluation alongside its zram. `nixpi` must be online.
+The rebuild also updates the SD boot files, so the next reboot uses the selected
+generation. Wi-Fi and Tailscale state are retained. No reflashing is needed.
+
+The builder identity is `/root/.ssh/nixzero-builder` on the Zero. Its public key
+is authorized in `nixpi.nix` with a forced Nix daemon command and SSH forwarding
+disabled. The private key stays on the Zero. A fresh installation needs a new
+key generated there and its public key enrolled on nixpi before remote builds
+can run. The verified nixpi SSH host key is pinned in `nixzero.nix`.
 
 Upstream references: [NixOS Raspberry Pi support](https://wiki.nixos.org/wiki/NixOS_on_ARM/Raspberry_Pi),
 [NetworkManager keyfiles](https://networkmanager.pages.freedesktop.org/NetworkManager/NetworkManager/nm-settings-keyfile.html),

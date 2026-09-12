@@ -81,7 +81,7 @@ def main():
     subprocess.run(['mkimage', '-A', 'arm64', '-O', 'linux', '-T', 'script', '-C', 'none',
                     '-n', 'nixzero headless diagnostics', '-d', str(args.script), str(args.output / 'nixzero-boot.scr')], check=True)
     shutil.copyfile(args.initrd, args.output / 'nixzero-initrd')
-    print(f'Diagnostic bundle prepared in {args.output}; no SD card was modified.')
+    print(f'Diagnostic bundle prepared in {args.output}.')
 
 
 if __name__ == '__main__':

@@ -19,17 +19,17 @@ inbound forwarding will not work behind carrier-grade NAT.
 
 ## 2. Activate the configuration
 
-The standard NixOS SD image labels its root partition `NIXOS_SD`. Confirm that
-the running installation uses that label:
+The root filesystem is configured in `hosts/nixpi/hardware.nix` using the
+installed image UUID. Confirm it matches the running installation:
 
 ```console
-findmnt -no LABEL /
+findmnt -no UUID /
 ```
 
 From this repository on the Pi, activate the flake:
 
 ```console
-sudo nixos-rebuild switch --flake .#raspberry-pi
+sudo nixos-rebuild switch --flake .#nixpi
 ```
 
 The first activation creates the PostgreSQL database, Redis instance, TLS

@@ -1,7 +1,24 @@
-{pkgs, t3code, codex, claude-code, ...}: {
+{
+  pkgs,
+  t3code,
+  codex,
+  claude-code,
+  ...
+}: {
+  services.hermes-agent.settings.dashboard.basic_auth.password_hash = "scrypt$16384$8$1$C/u7+bh7f40WrtPCxOH4Ag==$46xRc87TnVcjUrlsRitzvCf7h5WRMPIEMExDqFwGtUQ=";
+
+  system.stateVersion = "25.11";
+  time.timeZone = "Europe/Berlin";
+
   imports = [
-    ./modules/services/websupport-ddns.nix
-    ./modules/services/fitness-ai.nix
+    ./hardware.nix
+    ./networking.nix
+    ./nginx.nix
+    ../../modules/system/base.nix
+    ../../modules/services/nextcloud.nix
+    ../../modules/services/system-status.nix
+    ../../modules/services/websupport-ddns.nix
+    ../../modules/services/fitness-ai.nix
   ];
 
   # Dedicated Zero build key: Nix store protocol only, without shell access.

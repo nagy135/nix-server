@@ -4,9 +4,9 @@
   authDomain ? "auth.${domain}",
   basePort ? 4096,
   opencodePkg,
-  githubClientIDFile ? ../secrets/opencode-github-client-id,
-  githubClientSecretFile ? ../secrets/opencode-github-client-secret,
-  cookieSecretFile ? ../secrets/opencode-oauth2-cookie-secret,
+  githubClientIDFile ? "/etc/nixos/secrets/opencode-github-client-id",
+  githubClientSecretFile ? "/etc/nixos/secrets/opencode-github-client-secret",
+  cookieSecretFile ? "/etc/nixos/secrets/opencode-oauth2-cookie-secret",
   createUser ? true,
   user ? "opencode",
   group ? "opencode",
@@ -18,12 +18,8 @@
   pkgs,
   ...
 }: let
-  readSecret = path: lib.removeSuffix "\n" (builtins.readFile path);
-  githubClientID = readSecret githubClientIDFile;
-  githubClientSecret = readSecret githubClientSecretFile;
-  # oauth2-proxy accepts URL-safe base64 for cookie secrets; normalize the
-  # stored secret so a 32-byte base64 value is decoded correctly.
-  cookieSecret = builtins.replaceStrings ["+" "/" "="] ["-" "_" ""] (readSecret cookieSecretFile);
+  normalizedCookieSecretFile = "/run/oauth2-proxy/cookie-secret";
+  clientEnvironmentFile = "/run/oauth2-proxy/client-id.env";
   oauth2ProxyAddress = "http://127.0.0.1:4180";
   opencodeInstructionsPath = "/etc/opencode-service-instructions.md";
   opencodeConfigPath = "/etc/opencode-service-config.json";
@@ -122,19 +118,43 @@ in
           enable = true;
           provider = "github";
           reverseProxy = true;
+          trustedProxyIP = ["127.0.0.1" "::1"];
           setXauthrequest = true;
           httpAddress = oauth2ProxyAddress;
           redirectURL = "https://${authDomain}/oauth2/callback";
-          clientID = githubClientID;
-          clientSecret = githubClientSecret;
-          cookie.secret = cookieSecret;
+          keyFile = clientEnvironmentFile;
+          clientSecretFile = githubClientSecretFile;
           email.domains = ["*"];
           extraConfig = {
             upstream = ["static://202"];
             "cookie-domain" = ".${domain}";
             "whitelist-domain" = ".${domain}";
             "github-user" = "nagy135";
+            "cookie-secret-file" = normalizedCookieSecretFile;
           };
+        };
+
+        # NixOS now loads OAuth secrets at runtime. Keep the existing URL-safe
+        # base64 normalization without embedding secrets in the generated service configuration.
+        systemd.services.oauth2-proxy = {
+          serviceConfig = {
+            RuntimeDirectory = "oauth2-proxy";
+            RuntimeDirectoryMode = "0700";
+            LoadCredential = [
+              "client-id:${githubClientIDFile}"
+              "cookie-secret-raw:${cookieSecretFile}"
+            ];
+            # The file is created by ExecStartPre and loaded for ExecStart.
+            EnvironmentFile = lib.mkForce ["-${clientEnvironmentFile}"];
+          };
+          preStart = ''
+            umask 077
+            ${pkgs.coreutils}/bin/tr '+/' '-_' < "$CREDENTIALS_DIRECTORY/cookie-secret-raw" \
+              | ${pkgs.coreutils}/bin/tr -d '=\r\n' > ${normalizedCookieSecretFile}
+            client_id=$(${pkgs.coreutils}/bin/tr -d '\r\n' < "$CREDENTIALS_DIRECTORY/client-id")
+            [[ "$client_id" =~ ^[a-zA-Z0-9._-]+$ ]] || { echo "Invalid GitHub OAuth client ID" >&2; exit 1; }
+            printf 'OAUTH2_PROXY_CLIENT_ID=%s\n' "$client_id" > ${clientEnvironmentFile}
+          '';
         };
 
         services.nginx.virtualHosts.${authDomain} = {

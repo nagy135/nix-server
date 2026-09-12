@@ -37,7 +37,7 @@
       system,
       hostName,
       hermesDomain,
-      hardwareModules,
+      modules,
     }: let
       toolPkgs = import t3code-nixpkgs {
         inherit system;
@@ -51,11 +51,12 @@
           inherit (toolPkgs) t3code codex claude-code;
         };
         modules =
-          hardwareModules
+          modules
           ++ [
             home-manager.nixosModules.home-manager
             hermes-agent.nixosModules.default
-            ./configuration.nix
+            ./modules/users.nix
+            ./modules/services/hermes.nix
             {
               networking.hostName = hostName;
               home-manager = {
@@ -81,17 +82,16 @@
     nixosConfigurations = {
       nixzero = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
-        modules = [./nixzero.nix];
+        modules = [./hosts/nixzero];
       };
 
       nixpi = mkHost {
         system = "aarch64-linux";
         hostName = "nixpi";
         hermesDomain = "pi.infiniter.tech";
-        hardwareModules = [
+        modules = [
           nixos-hardware.nixosModules.raspberry-pi-5
-          ./hardware-configuration-nixpi.nix
-          ./nixpi.nix
+          ./hosts/nixpi
         ];
       };
 
@@ -99,7 +99,7 @@
         system = "x86_64-linux";
         hostName = "hetzner";
         hermesDomain = "agent.infiniter.tech";
-        hardwareModules = [./hardware-configuration-hetzner.nix];
+        modules = [./hosts/hetzner];
       };
     };
   };

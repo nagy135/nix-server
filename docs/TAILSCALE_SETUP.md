@@ -1,7 +1,8 @@
 # SSH to nixpi through Tailscale
 
 This repository uses `.#nixpi` for the Raspberry Pi 5 and `.#hetzner` for the
-other server. Tailscale is enabled only in `nixpi.nix`. OpenSSH and the existing
+Hetzner server; `.#nixzero` selects the Zero 2 W. Tailscale is enabled on both
+Pis. On nixpi, OpenSSH and the existing
 authorized keys come from `modules/system/base.nix` and `modules/users.nix`.
 Use the normal `infiniter` account for SSH.
 
@@ -70,7 +71,7 @@ TS=/Applications/Tailscale.app/Contents/MacOS/Tailscale
 - SSH over both the Pi's Tailscale IPv4 and full MagicDNS name succeeded as `infiniter` with the trusted host key.
 - The final `.#nixpi` configuration built and activated successfully; `tailscaled` and `sshd` are enabled and active.
 - The boot-time preferences service completed successfully; the active IPv4/IPv6 input chains use only the existing NixOS firewall.
-- The local and deployed `nixpi.nix` match; `flake.lock` is unchanged.
+- At verification time, local and deployed configurations matched; `flake.lock` was unchanged.
 - No failed systemd units remained after activation.
 - The successful SSH connection was from `100.103.11.44` to `100.86.114.37:22`.
 - Encrypted connectivity worked through the Frankfurt DERP relay and later established a direct connection; either is valid.
@@ -192,7 +193,7 @@ the existing server on the Pi. Do not enable T3 Connect for the Pi.
 
 The Pi's `t3code.service` remains enabled at boot and binds only to
 `127.0.0.1:3773`. Its public nginx virtual host and T3 Connect environment
-variables were removed from `nixpi.nix`; its saved T3 Connect link was disabled
+variables were removed from `hosts/nixpi/default.nix`; its saved T3 Connect link was disabled
 with `t3 connect unlink`, which also revoked the relay-side environment record.
 The service was restarted and the Pi's cloudflared process stopped. The Mac's
 own T3 Connect setting was not changed.

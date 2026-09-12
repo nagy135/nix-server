@@ -126,26 +126,26 @@ ssh infiniter@nixzero.tail6650cb.ts.net
 
 ## Update from nixzero
 
-The repository is checked out at `/etc/nixos`, tracking `feat/raspberry_pi`.
-From a root shell (`sudo -i`), use the standard commands:
+Use a checkout of `master` at `/etc/nixos` (see the branch migration in the
+[root README](../README.md)). From a root shell (`sudo -i`):
 
 ```sh
 cd /etc/nixos
-git pull
-nixos-rebuild switch --flake /etc/nixos
+git pull --ff-only
+nixos-rebuild switch --flake .#nixzero
 ```
 
-NixOS selects `nixosConfigurations.nixzero` using the hostname. Evaluation and
+The explicit `#nixzero` selects this host configuration. Evaluation and
 activation run on the Zero; Nix sends builds to `nixpi` over Tailscale. The Zero
 has a 2 GiB swap file for evaluation alongside its zram. `nixpi` must be online.
 The rebuild also updates the SD boot files, so the next reboot uses the selected
 generation. Wi-Fi and Tailscale state are retained. No reflashing is needed.
 
 The builder identity is `/root/.ssh/nixzero-builder` on the Zero. Its public key
-is authorized in `nixpi.nix` with a forced Nix daemon command and SSH forwarding
+is authorized in `hosts/nixpi/default.nix` with a forced Nix daemon command and SSH forwarding
 disabled. The private key stays on the Zero. A fresh installation needs a new
 key generated there and its public key enrolled on nixpi before remote builds
-can run. The verified nixpi SSH host key is pinned in `nixzero.nix`.
+can run. The verified nixpi SSH host key is pinned in `hosts/nixzero/default.nix`.
 
 Upstream references: [NixOS Raspberry Pi support](https://wiki.nixos.org/wiki/NixOS_on_ARM/Raspberry_Pi),
 [NetworkManager keyfiles](https://networkmanager.pages.freedesktop.org/NetworkManager/NetworkManager/nm-settings-keyfile.html),

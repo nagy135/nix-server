@@ -43,7 +43,6 @@ in {
         public_url = "https://${hermesDomain}";
         basic_auth = {
           username = "infiniter";
-          password_hash = "scrypt$16384$8$1$C/u7+bh7f40WrtPCxOH4Ag==$46xRc87TnVcjUrlsRitzvCf7h5WRMPIEMExDqFwGtUQ=";
         };
       };
 

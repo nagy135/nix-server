@@ -1,6 +1,6 @@
 # Fitness AI on nixpi
 
-`modules/services/fitness-ai.nix`, imported only by `nixpi.nix`, runs the
+`modules/services/fitness-ai.nix`, imported only by `hosts/nixpi/default.nix`, runs the
 Fitness AI Convex backend with a pinned ARM64 Docker image.
 
 - API/WebSocket endpoint: `https://fitness-ai.infiniter.tech`

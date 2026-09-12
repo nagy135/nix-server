@@ -5,13 +5,13 @@
   modulesPath,
   ...
 }: let
-  sshKeys = import ./modules/ssh-keys.nix;
+  sshKeys = import ../../modules/ssh-keys.nix;
 in {
   imports = [
     (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
     (modulesPath + "/profiles/minimal.nix")
-    ./modules/nixzero-boot-diagnostics.nix
-    ./modules/nixzero-updates.nix
+    ../../modules/nixzero-boot-diagnostics.nix
+    ../../modules/nixzero-updates.nix
   ];
 
   # The generic image supplies Zero 2 W firmware, U-Boot and extlinux.
@@ -31,8 +31,8 @@ in {
       ${config.boot.loader.generic-extlinux-compatible.populateCmd} \
         -c ${config.system.build.toplevel} -d "$TMPDIR/nixzero-boot"
       export PATH=${lib.makeBinPath [pkgs.ubootTools]}:$PATH
-      ${pkgs.python3}/bin/python3 ${./scripts/prepare-nixzero-diagnostics.py} \
-        --script ${./scripts/nixzero-boot.cmd} \
+      ${pkgs.python3}/bin/python3 ${../../scripts/prepare-nixzero-diagnostics.py} \
+        --script ${../../scripts/nixzero-boot.cmd} \
         --extlinux "$TMPDIR/nixzero-boot/extlinux/extlinux.conf" \
         --initrd ${config.system.build.initialRamdisk}/initrd \
         --output "$TMPDIR/nixzero-diagnostics"

@@ -1,5 +1,8 @@
 {pkgs, t3code, codex, claude-code, ...}: {
-  imports = [./modules/services/websupport-ddns.nix];
+  imports = [
+    ./modules/services/websupport-ddns.nix
+    ./modules/services/fitness-ai.nix
+  ];
 
   # Dedicated Zero build key: Nix store protocol only, without shell access.
   users.users.root.openssh.authorizedKeys.keys = [

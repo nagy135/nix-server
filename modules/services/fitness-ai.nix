@@ -1,6 +1,7 @@
 {pkgs, ...}: let
   apiDomain = "fitness-ai.infiniter.tech";
   authDomain = "fitness-ai-auth.infiniter.tech";
+  dashboardDomain = "fitness-ai-dashboard.infiniter.tech";
   stateDir = "/var/lib/fitness-ai";
 in {
   # Generate the instance secret on the server, outside Git and the Nix store.
@@ -25,6 +26,13 @@ in {
 
   virtualisation.oci-containers = {
     backend = "docker";
+    containers.fitness-ai-dashboard = {
+      # ARM64 image pinned for reproducible nixpi deployments.
+      image = "ghcr.io/get-convex/convex-dashboard@sha256:0b26d6f021d418e4027b055758242717b5e35596ac26a6fdc54736b6b3cd8c6c";
+      ports = ["127.0.0.1:16791:6791"];
+      environment.NEXT_PUBLIC_DEPLOYMENT_URL = "https://${apiDomain}";
+      extraOptions = ["--stop-signal=SIGINT" "--stop-timeout=10"];
+    };
     containers.fitness-ai-convex = {
       # ARM64 image pinned for reproducible nixpi deployments.
       image = "ghcr.io/get-convex/convex-backend@sha256:ca2c9a62465f259ff55448ef246fa30bd9148fbce76c545131dbb44a943f5356";
@@ -59,6 +67,14 @@ in {
   };
 
   services.nginx.virtualHosts = {
+    ${dashboardDomain} = {
+      enableACME = true;
+      forceSSL = true;
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:16791";
+        proxyWebsockets = true;
+      };
+    };
     ${apiDomain} = {
       enableACME = true;
       forceSSL = true;
@@ -82,5 +98,5 @@ in {
     };
   };
 
-  services.infiniter.websupportDDNS.records = ["fitness-ai" "fitness-ai-auth"];
+  services.infiniter.websupportDDNS.records = ["fitness-ai" "fitness-ai-auth" "fitness-ai-dashboard"];
 }

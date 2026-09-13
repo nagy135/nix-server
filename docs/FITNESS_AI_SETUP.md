@@ -5,14 +5,25 @@ Fitness AI Convex backend with a pinned ARM64 Docker image.
 
 - API/WebSocket endpoint: `https://fitness-ai.infiniter.tech`
 - HTTP actions and Better Auth: `https://fitness-ai-auth.infiniter.tech`
+- Dashboard: `https://fitness-ai-dashboard.infiniter.tech`
 - Container: `fitness-ai-convex`
+- Dashboard container: `fitness-ai-dashboard` (pinned ARM64 image)
 - Persistent Docker volume: `fitness-ai-convex-data`
 - Instance credentials: `/var/lib/fitness-ai/backend.env` (root-only,
   generated on first start, never in Git or the Nix store)
 
-The existing Websupport DDNS service publishes both DNS records. nginx handles
-HTTPS with ACME and proxies to loopback ports 13210 and 13211. No dashboard or
-raw Docker port is exposed publicly.
+The existing Websupport DDNS service publishes all three DNS records. nginx handles
+HTTPS with ACME and proxies to loopback ports 13210 (API), 13211 (auth), and
+16791 (dashboard). Raw Docker ports are not exposed publicly.
+
+Log into the dashboard with the deployment's admin key from the Fitness AI
+repository's ignored `.env.production.local`. To retrieve a key on the server,
+run `docker exec fitness-ai-convex ./generate_admin_key.sh`. Do not put the key
+in the dashboard container environment or Nix configuration.
+
+Use **Data**, then select a table and double-click a cell or right-click a row
+and choose **Edit Document**. Edits affect the live deployment immediately;
+preserve confirmed workouts as immutable application history.
 
 ## Apply and check
 
@@ -22,11 +33,13 @@ git pull --ff-only
 nixos-rebuild switch --flake .#nixpi --no-write-lock-file
 systemctl start websupport-ddns
 systemctl status docker-fitness-ai-convex
+systemctl status docker-fitness-ai-dashboard
 curl -fsS https://fitness-ai.infiniter.tech/version
+curl -I https://fitness-ai-dashboard.infiniter.tech
 ```
 
 On the first deployment, DNS must resolve to the Pi before ACME can issue the
-certificates. Retry the two `acme-fitness-ai*.infiniter.tech` services if DNS
+certificates. Retry the `acme-fitness-ai*.infiniter.tech` services if DNS
 propagation delayed initial issuance.
 
 ## Deploy application functions

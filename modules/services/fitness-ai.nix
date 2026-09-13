@@ -27,8 +27,8 @@ in {
   virtualisation.oci-containers = {
     backend = "docker";
     containers.fitness-ai-dashboard = {
-      # ARM64 image pinned for reproducible nixpi deployments.
-      image = "ghcr.io/get-convex/convex-dashboard@sha256:0b26d6f021d418e4027b055758242717b5e35596ac26a6fdc54736b6b3cd8c6c";
+      # Known-working ARM64 release; newer images fail with missing Radix modules.
+      image = "ghcr.io/get-convex/convex-dashboard@sha256:c8d5220d9b86da5bc77033f33da2875578ad583b9c1e7ee0eaaa57e23b9d2361";
       ports = ["127.0.0.1:16791:6791"];
       environment.NEXT_PUBLIC_DEPLOYMENT_URL = "https://${apiDomain}";
       extraOptions = ["--stop-signal=SIGINT" "--stop-timeout=10"];

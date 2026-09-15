@@ -37,7 +37,7 @@
     extraSetFlags = ["--netfilter-mode=off" "--ssh=false" "--accept-routes=false"];
   };
 
-  environment.systemPackages = [t3code codex claude-code pkgs.stow pkgs.delta];
+  environment.systemPackages = [t3code codex claude-code pkgs.stow pkgs.delta pkgs.glab];
 
   systemd.services.t3code = {
     description = "T3 Code server";

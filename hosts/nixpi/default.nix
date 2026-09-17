@@ -69,6 +69,7 @@
       "fit"
       "fit-api"
       "pi-status"
+      "speech"
     ];
   };
 

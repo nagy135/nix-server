@@ -6,6 +6,15 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
+    virtualHosts."speech.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:13004";
+      };
+    };
+
     virtualHosts."bread.infiniter.tech" = {
       enableACME = true;
       forceSSL = true;

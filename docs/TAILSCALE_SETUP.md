@@ -208,10 +208,26 @@ not the Pi. Cached answers may also persist briefly. Neither changes the fact
 that the Pi's public nginx route to T3 Code has been removed.
 
 Verified: the desktop shows **nixpi Connected** over SSH; its local SSH forward
-returns the existing `nixpi` Linux/ARM64 environment descriptor (T3 Code 0.0.40).
+returns the existing `nixpi` Linux/ARM64 environment (T3 Code 0.0.42).
 The Pi listens only on loopback port 3773 and its active nginx configuration
 contains no T3 Code proxy. No extra firewall ports, Tailscale Serve, or Funnel
 were enabled.
+
+### T3 Code 0.0.42 upgrade
+
+The service uses the checksum-pinned ARM64 standalone release in
+`pkgs/t3code-server.nix` while nixpkgs still packages 0.0.40. Nix patches its
+ELF loader and native library paths. The desktop also downloads its own helper
+to `~/.t3/runtime/versions`; `programs.nix-ld.enable` lets that unpatched release
+run on NixOS. Without it, SSH setup fails with "The t3 0.0.42 executable does not
+run on this host" before it can connect to the existing service.
+
+Deployed with `nixos-rebuild switch --flake /etc/nixos#nixpi` on 2026-09-20.
+Verified the packaged server and downloaded helper report 0.0.42, database
+migrations succeed, the original environment ID is retained, and the Mac
+shows **nixpi Connected**. The service remains enabled at boot and bound to
+loopback. A backup made while the service was stopped is stored on the Pi at
+`/var/backups/t3code/userdata-before-0.0.42-20260920.tar.gz`.
 
 For a temporary browser connection, run this on the Mac and leave it running:
 

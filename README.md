@@ -68,6 +68,7 @@ interfaces and runtime network files are untouched.
 
 - `hosts/<name>/`: host configuration, hardware, networking, and web routes.
 - `modules/`: shared users, system components, editors, and service modules.
+- `assets/motd/`: ASCII login banners for nixpi and Hetzner, selected by hostname.
 - `home.nix`, `home/`: Home Manager configuration for Hetzner and nixpi.
 - `scripts/`: validation and Zero image/Wi-Fi/boot helpers.
 - `docs/`: [Pi 5 / Nextcloud](docs/RASPBERRY_PI_SETUP.md),

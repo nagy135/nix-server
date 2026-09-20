@@ -56,6 +56,7 @@
             home-manager.nixosModules.home-manager
             hermes-agent.nixosModules.default
             ./modules/users.nix
+            ./modules/system/login-banner.nix
             ./modules/services/hermes.nix
             {
               networking.hostName = hostName;

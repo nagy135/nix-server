@@ -23,6 +23,11 @@
     })
   ];
 
+  # Allow the nixpi user to connect directly to this host.
+  users.users.infiniter.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcxBodMurVsakhLxTMpSqnxrSXOI3Wmo++9MoQpNr42 infiniter@nixpi"
+  ];
+
   # Keep the installed host's compatibility version when updating Nixpkgs.
   system.stateVersion = "24.11";
   services.hermes-agent.settings = {

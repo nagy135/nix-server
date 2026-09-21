@@ -76,6 +76,7 @@ in {
       "fit-api"
       "pi-status"
       "speech"
+      "conversation"
     ];
   };
 

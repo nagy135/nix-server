@@ -77,6 +77,7 @@ in {
       "pi-status"
       "speech"
       "conversation"
+      "relay"
     ];
   };
 

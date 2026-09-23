@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "claude-nixpkgs": {
+      "locked": {
+        "lastModified": 1790158986,
+        "narHash": "sha256-NGwkEHe+Pf/xQtSNXayuk8aaHsE64o6nIkGBoU2NwKA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8f61efd04af9e890e0df64e03c244c62330c2788",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "master",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -228,6 +244,7 @@
     },
     "root": {
       "inputs": {
+        "claude-nixpkgs": "claude-nixpkgs",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",

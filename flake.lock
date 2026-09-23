@@ -16,22 +16,6 @@
         "type": "github"
       }
     },
-    "codex-nixpkgs": {
-      "locked": {
-        "lastModified": 1790161516,
-        "narHash": "sha256-cYvMwXGzZXOmmwcp8Zh7eD3rhLAK0dwAibdYtuJi6qU=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "8ab7689490b5595a5eaefe05bfb09dcdb89ea1f4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "master",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -261,7 +245,6 @@
     "root": {
       "inputs": {
         "claude-nixpkgs": "claude-nixpkgs",
-        "codex-nixpkgs": "codex-nixpkgs",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",
         "nixos-hardware": "nixos-hardware",

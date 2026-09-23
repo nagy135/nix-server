@@ -16,7 +16,8 @@
   webhookPort = 8644;
 in {
   services.hermes-agent = {
-    enable = true;
+    # Temporarily disabled on both servers; retain settings for re-enabling.
+    enable = false;
 
     # Run Hermes directly as the dedicated `hermes` system user instead of
     # inside Docker, so it can reach host services/files normally.
@@ -69,18 +70,18 @@ in {
     };
   };
 
-  users.users.infiniter.extraGroups = [cfg.group];
+  users.users.infiniter.extraGroups = lib.mkIf cfg.enable [cfg.group];
 
   # Native Hermes is still sandboxed by systemd's ProtectSystem=strict in the
   # upstream module. Explicitly allow writes to the user's home.
-  systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [
-    "/home/infiniter"
-  ];
+  systemd.services.hermes-agent = lib.mkIf cfg.enable {
+    serviceConfig.ReadWritePaths = ["/home/infiniter"];
+  };
 
   # Give the dedicated `hermes` user POSIX ACL access to /home/infiniter.
   # The recursive ACL migration is expensive, so run it once. After that,
   # default ACLs on directories make newly-created files editable by both users.
-  system.activationScripts.hermes-home-access = lib.stringAfter ["users"] ''
+  system.activationScripts.hermes-home-access = lib.mkIf cfg.enable (lib.stringAfter ["users"] ''
     if [ -d /home/infiniter ]; then
       mkdir -p ${cfg.stateDir}
       if [ ! -e ${cfg.stateDir}/.home-acls-initialized ]; then
@@ -91,9 +92,9 @@ in {
         ${pkgs.acl}/bin/setfacl -m u:${cfg.user}:rwx,d:u:${cfg.user}:rwx,d:u:infiniter:rwx /home/infiniter
       fi
     fi
-  '';
+  '');
 
-  systemd.services.hermes-dashboard = {
+  systemd.services.hermes-dashboard = lib.mkIf cfg.enable {
     description = "Hermes Agent Dashboard";
     wantedBy = ["multi-user.target"];
     after = ["hermes-agent.service" "network-online.target"];
@@ -122,7 +123,7 @@ in {
     };
   };
 
-  services.nginx.virtualHosts.${hermesDomain} =
+  services.nginx.virtualHosts.${hermesDomain} = lib.mkIf cfg.enable (
     ssl
     // {
       locations."/webhooks/" = {
@@ -148,5 +149,6 @@ in {
       serverAliases = [
         "www.${hermesDomain}"
       ];
-    };
+    }
+  );
 }

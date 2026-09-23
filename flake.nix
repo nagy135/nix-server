@@ -5,6 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # Update CLI tools independently of the base system.
     t3code-nixpkgs.url = "github:NixOS/nixpkgs/master";
+    codex-nixpkgs.url = "github:NixOS/nixpkgs/master";
     claude-nixpkgs.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -29,6 +30,7 @@
     hermes-agent,
     nixpkgs,
     t3code-nixpkgs,
+    codex-nixpkgs,
     claude-nixpkgs,
     nixos-hardware,
     nvf,
@@ -48,12 +50,16 @@
         inherit system;
         config.allowUnfreePredicate = package: nixpkgs.lib.getName package == "claude-code";
       };
+      codexPkgs = import codex-nixpkgs {
+        inherit system;
+      };
     in
       nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
           inherit hermesDomain nvf;
-          inherit (toolPkgs) t3code codex;
+          inherit (toolPkgs) t3code;
+          codex = if hostName == "nixpi" then codexPkgs.codex else toolPkgs.codex;
           inherit (claudePkgs) claude-code;
         };
         modules =

@@ -18,6 +18,7 @@ in {
     ./nginx.nix
     ../../modules/system/base.nix
     ../../modules/services/nextcloud.nix
+    ../../modules/services/uptime-dashboard.nix
     ../../modules/services/system-status.nix
     ../../modules/services/websupport-ddns.nix
     ../../modules/services/fitness-ai.nix

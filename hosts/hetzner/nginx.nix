@@ -112,63 +112,6 @@ in {
         };
       };
 
-    "clerk.infiniter.tech" =
-      SSL
-      // {
-        locations."/" = {
-          proxyPass = "https://4qkmi9pm8ib2.clerk.accounts.dev";
-          extraConfig = ''
-            proxy_ssl_server_name on;
-            proxy_set_header Host 4qkmi9pm8ib2.clerk.accounts.dev;
-            proxy_set_header X-Forwarded-Host clerk.infiniter.tech;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto https;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header Origin $http_origin;
-            proxy_set_header Cookie $http_cookie;
-            proxy_http_version 1.1;
-            proxy_pass_request_body on;
-            proxy_pass_request_headers on;
-
-            proxy_cookie_domain 4qkmi9pm8ib2.clerk.accounts.dev clerk.infiniter.tech;
-            proxy_cookie_path / /;
-
-            proxy_hide_header 'Access-Control-Allow-Origin';
-            proxy_hide_header 'Access-Control-Allow-Credentials';
-
-            if ($request_method = 'OPTIONS') {
-              add_header 'Access-Control-Allow-Origin' '$http_origin' always;
-              add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
-              add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, X-Requested-With, Clerk-Proxy-Url, Cookie' always;
-              add_header 'Access-Control-Allow-Credentials' 'true' always;
-              add_header 'Access-Control-Max-Age' 86400;
-              return 204;
-            }
-
-            add_header 'Access-Control-Allow-Origin' '$http_origin' always;
-            add_header 'Access-Control-Allow-Credentials' 'true' always;
-          '';
-        };
-
-        locations."/npm/" = {
-          proxyPass = "https://4qkmi9pm8ib2.clerk.accounts.dev";
-          extraConfig = ''
-            proxy_ssl_server_name on;
-            proxy_set_header Host 4qkmi9pm8ib2.clerk.accounts.dev;
-            proxy_http_version 1.1;
-
-            proxy_hide_header 'Access-Control-Allow-Origin';
-            proxy_hide_header 'Access-Control-Allow-Credentials';
-
-            add_header 'Access-Control-Allow-Origin' '*' always;
-          '';
-        };
-
-        serverAliases = [
-          "www.clerk.infiniter.tech"
-        ];
-      };
-
     "db-gol.infiniter.tech" =
       SSL
       // {

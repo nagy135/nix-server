@@ -80,6 +80,7 @@ in {
       "speech"
       "conversation"
       "relay"
+      "fish"
     ];
   };
 

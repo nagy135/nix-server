@@ -6,6 +6,22 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
+    # On My Way live meeting maps, started with Compose in ~/services/onmyway.
+    virtualHosts."omw.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:13007";
+        extraConfig = ''
+          # SSE snapshots must reach participants without buffering.
+          proxy_buffering off;
+          proxy_read_timeout 90s;
+          gzip off;
+        '';
+      };
+    };
+
     # Docsheet medical calculators; static releases switch atomically.
     virtualHosts."docsheet.infiniter.tech" = {
       enableACME = true;

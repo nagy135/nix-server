@@ -82,6 +82,7 @@ in {
       "relay"
       "fish"
       "docsheet"
+      "omw"
     ];
   };
 

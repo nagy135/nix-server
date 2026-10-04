@@ -2,7 +2,12 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  shiftDistributorBackup = pkgs.writeScriptBin "shift-distributor-backup" ''
+    #!${pkgs.python3}/bin/python3
+    ${builtins.readFile ./shift-distributor-backup.py}
+  '';
+in {
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
   services.nscd.enable = false;
@@ -83,6 +88,6 @@
 
   services.cron.enable = true;
   services.cron.systemCronJobs = [
-    "0 * * * * root mkdir -p /home/infiniter/services/shift-distributor/data/backups && cp /home/infiniter/services/shift-distributor/data/sqlite.db /home/infiniter/services/shift-distributor/data/backups/sqlite-$(date +\\%F-\\%R).db &> /tmp/heh.log"
+    "0 * * * * infiniter ${shiftDistributorBackup}/bin/shift-distributor-backup"
   ];
 }

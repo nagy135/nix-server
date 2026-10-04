@@ -83,6 +83,7 @@ in {
       "fish"
       "docsheet"
       "omw"
+      "spore"
     ];
   };
 

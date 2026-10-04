@@ -43,6 +43,27 @@
       };
     };
 
+    # Browser-only Verdant evolution game; releases switch atomically.
+    virtualHosts."spore.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+      root = "/var/www/spore/current";
+
+      locations."/" = {
+        tryFiles = "$uri $uri/ =404";
+        extraConfig = ''
+          add_header Cache-Control "no-cache";
+        '';
+      };
+
+      locations."^~ /assets/" = {
+        tryFiles = "$uri =404";
+        extraConfig = ''
+          add_header Cache-Control "public, max-age=31536000, immutable";
+        '';
+      };
+    };
+
     # Static Little Depths game; deployments atomically replace current.
     virtualHosts."fish.infiniter.tech" = {
       enableACME = true;
@@ -145,5 +166,7 @@
     "d /var/www/docsheet/releases 0755 infiniter users -"
     "d /var/www/fish 0755 infiniter users -"
     "d /var/www/fish/releases 0755 infiniter users -"
+    "d /var/www/spore 0755 infiniter users -"
+    "d /var/www/spore/releases 0755 infiniter users -"
   ];
 }

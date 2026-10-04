@@ -6,6 +6,27 @@
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
+    # Docsheet medical calculators; static releases switch atomically.
+    virtualHosts."docsheet.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+      root = "/var/www/docsheet/current";
+
+      locations."/" = {
+        tryFiles = "$uri $uri/ =404";
+        extraConfig = ''
+          add_header Cache-Control "no-cache";
+        '';
+      };
+
+      locations."^~ /assets/" = {
+        tryFiles = "$uri =404";
+        extraConfig = ''
+          add_header Cache-Control "public, max-age=31536000, immutable";
+        '';
+      };
+    };
+
     # Static Little Depths game; deployments atomically replace current.
     virtualHosts."fish.infiniter.tech" = {
       enableACME = true;
@@ -104,6 +125,8 @@
 
   systemd.tmpfiles.rules = [
     "d /var/www 0755 root root -"
+    "d /var/www/docsheet 0755 infiniter users -"
+    "d /var/www/docsheet/releases 0755 infiniter users -"
     "d /var/www/fish 0755 infiniter users -"
     "d /var/www/fish/releases 0755 infiniter users -"
   ];

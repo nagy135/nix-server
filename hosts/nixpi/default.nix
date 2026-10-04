@@ -81,6 +81,7 @@ in {
       "conversation"
       "relay"
       "fish"
+      "docsheet"
     ];
   };
 

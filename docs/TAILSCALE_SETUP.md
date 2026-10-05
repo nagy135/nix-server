@@ -229,6 +229,26 @@ shows **nixpi Connected**. The service remains enabled at boot and bound to
 loopback. A backup made while the service was stopped is stored on the Pi at
 `/var/backups/t3code/userdata-before-0.0.42-20260920.tar.gz`.
 
+### T3 Code 0.0.45 upgrade
+
+The Nix-managed service was upgraded from 0.0.42 to 0.0.45 on 2026-10-05
+with `nixos-rebuild switch --flake /etc/nixos#nixpi --no-write-lock-file`.
+`pkgs/t3code-server.nix` pins the official Linux/ARM64 release and its SHA-256;
+the flake inputs were unchanged. The system closure differs only in the
+T3 Code package.
+
+Verified the packaged server reports 0.0.45, `t3code.service` is active and
+enabled at boot, HTTP returns 200, and the service still listens only on
+`127.0.0.1:3773`. The existing desktop-downloaded SSH helper at
+`~/.t3/runtime/versions/0.0.45/t3` also reports 0.0.45. No `npx` installation
+is needed to update the managed service.
+
+A full userdata backup, made while the service was stopped, is stored at
+`/var/backups/t3code/userdata-before-0.0.45-20261005-110534.tar.gz`.
+Both the backup and live SQLite database pass `PRAGMA quick_check`, and the
+environment ID is unchanged. All host derivations, the Zero SD image, and
+`nix flake check --all-systems --no-build --no-write-lock-file` passed.
+
 For a temporary browser connection, run this on the Mac and leave it running:
 
 ```sh

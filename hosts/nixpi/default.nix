@@ -4,7 +4,7 @@
   claude-code,
   ...
 }: let
-  # nixpkgs still packages 0.0.40; use the matching standalone server release.
+  # Pin the standalone server release to match the desktop client.
   t3code = pkgs.callPackage ../../pkgs/t3code-server.nix {};
 in {
   services.hermes-agent.settings.dashboard.basic_auth.password_hash = "scrypt$16384$8$1$C/u7+bh7f40WrtPCxOH4Ag==$46xRc87TnVcjUrlsRitzvCf7h5WRMPIEMExDqFwGtUQ=";

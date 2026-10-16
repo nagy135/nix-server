@@ -179,7 +179,32 @@ backed up to `/etc/nixos/nixpi.nix.before-tailscale` during setup. If rollback i
 needed, use LAN SSH or the Pi console and run `sudo nixos-rebuild switch --rollback`;
 then reconcile the source configuration before a future rebuild.
 
-## T3 Code: private Pi environment
+## T3 Code: Pi remote access
+
+### T3 Connect for Android
+
+T3 Connect was enabled for the existing **nixpi** environment on 2026-10-16
+using its saved account authorization. In the Android app, sign in to the
+same T3 Connect account and select **nixpi**. This route works over the
+internet without a manual server URL, pairing code, or Tailscale connection.
+
+`t3code.service` remains managed by NixOS and listens on `127.0.0.1:3773`.
+`hosts/nixpi/default.nix` includes `pkgs.cloudflared` in the system packages,
+so the service uses the Nix-managed tunnel client from `PATH`. T3 Code manages
+the authenticated tunnel as a child of that service. Credentials and the
+desired link state stay in the user's existing T3 data directory, outside Git.
+There is no additional `t3 service install` service.
+
+Setup used `t3 connect link --headless` as `infiniter`, then restarted the
+existing system service after `nixos-rebuild switch`. The saved authorization
+was reused without another sign-in. Verified that `t3 connect status --json`
+reports enabled, authenticated, linked, and not revoked, with relay client
+source `path` (cloudflared 2026.6.1). The service registered four tunnel
+connections, completed managed tunnel registration, and its environment
+discovery endpoint returns HTTP 200. Agent activity publishing retains its
+existing disabled setting.
+
+### Direct connections over Tailscale
 
 The Mac's T3 Code app is paired with the existing **nixpi** environment over
 **SSH `infiniter@nixpi.tail6650cb.ts.net:22`**. It manages the SSH port forward
@@ -189,11 +214,20 @@ the Pi. The local Mac environment is separate.
 
 To add the connection again: **Settings > Connections > Add environment > SSH**,
 host `nixpi.tail6650cb.ts.net`, username `infiniter`, port `22`. The app reuses
-the existing server on the Pi. Do not enable T3 Connect for the Pi.
+the existing server on the Pi.
+
+A separate existing Tailscale Serve mapping exposes the same backend at
+`https://nixpi.tail6650cb.ts.net:8443`. Use this address for direct pairing
+while Tailscale is connected. Port `3773` is the loopback HTTP backend;
+`https://nixpi.tail6650cb.ts.net:3773` is not a reachable HTTPS endpoint.
+Verified the `:8443/.well-known/t3/environment` endpoint returns HTTP 200
+with a valid TLS certificate.
+
+### Previous public route removal
 
 The Pi's `t3code.service` remains enabled at boot and binds only to
-`127.0.0.1:3773`. Its public nginx virtual host and T3 Connect environment
-variables were removed from `hosts/nixpi/default.nix`; its saved T3 Connect link was disabled
+`127.0.0.1:3773`. Its public nginx virtual host and previous T3 Connect environment
+variables were removed from `hosts/nixpi/default.nix`; its previous T3 Connect link was disabled
 with `t3 connect unlink`, which also revoked the relay-side environment record.
 The service was restarted and the Pi's cloudflared process stopped. The Mac's
 own T3 Connect setting was not changed.
@@ -210,8 +244,9 @@ that the Pi's public nginx route to T3 Code has been removed.
 Verified: the desktop shows **nixpi Connected** over SSH; its local SSH forward
 returns the existing `nixpi` Linux/ARM64 environment (T3 Code 0.0.42).
 The Pi listens only on loopback port 3773 and its active nginx configuration
-contains no T3 Code proxy. No extra firewall ports, Tailscale Serve, or Funnel
-were enabled.
+contains no T3 Code proxy. At that time, no extra firewall ports, Tailscale
+Serve, or Funnel were enabled. The current T3 Connect and Tailscale HTTPS
+routes are described above.
 
 ### T3 Code 0.0.42 upgrade
 

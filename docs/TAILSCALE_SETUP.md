@@ -249,6 +249,32 @@ Both the backup and live SQLite database pass `PRAGMA quick_check`, and the
 environment ID is unchanged. All host derivations, the Zero SD image, and
 `nix flake check --all-systems --no-build --no-write-lock-file` passed.
 
+### T3 Code 0.1.0 upgrade
+
+The Nix-managed service was upgraded from 0.0.45 to 0.1.0 on 2026-10-16
+with `nixos-rebuild switch --flake /etc/nixos#nixpi --no-write-lock-file`.
+The package pins the official Linux/ARM64 release and its published SHA-256;
+the flake inputs were unchanged. The system closure differs only in the
+T3 Code package. The system build and
+`nix flake check --all-systems --no-build --no-write-lock-file` passed.
+
+A full userdata backup, made while the service was stopped, is stored at
+`/var/backups/t3code/userdata-before-0.1.0-20261016-210308.tar.gz`.
+Both databases in the extracted backup pass `PRAGMA quick_check`.
+The previous system path, environment-ID checksum, and original project and
+thread IDs are also recorded under `/var/backups/t3code`.
+
+The V2 migration imported all 26 threads and their transcripts, with all
+9 project IDs and 26 thread IDs preserved. The original `state.sqlite` remains
+in place; V2 uses `statev2.sqlite`. Both live databases pass `PRAGMA quick_check`,
+and the environment ID is unchanged. The packaged server and desktop-downloaded
+SSH helper both report 0.1.0. The service is active and enabled at boot, HTTP
+returns 200, and it still listens only on `127.0.0.1:3773`.
+
+Clients connecting to this server must support V2 (desktop 0.1.0 or newer,
+mobile 2.0 or newer). V1 and V2 database changes do not synchronize after
+the migration; see the [upstream migration notes](https://github.com/pingdotgg/t3code/issues/14871).
+
 For a temporary browser connection, run this on the Mac and leave it running:
 
 ```sh

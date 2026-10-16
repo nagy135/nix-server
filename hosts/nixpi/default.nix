@@ -41,7 +41,8 @@ in {
     extraSetFlags = ["--netfilter-mode=off" "--ssh=false" "--accept-routes=false"];
   };
 
-  environment.systemPackages = [t3code codex claude-code pkgs.stow pkgs.delta pkgs.glab];
+  # T3 Connect uses cloudflared from PATH; keep its tunnel client managed by Nix.
+  environment.systemPackages = [t3code codex claude-code pkgs.cloudflared pkgs.stow pkgs.delta pkgs.glab];
 
   # Desktop SSH connections download a standalone t3 helper into ~/.t3.
   # It needs the standard Linux loader even when the service is Nix-packaged.

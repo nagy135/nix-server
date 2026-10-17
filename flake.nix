@@ -6,6 +6,7 @@
     # Update CLI tools independently of the base system.
     t3code-nixpkgs.url = "github:NixOS/nixpkgs/master";
     claude-nixpkgs.url = "github:NixOS/nixpkgs/master";
+    codex-nixpkgs.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,6 +31,7 @@
     nixpkgs,
     t3code-nixpkgs,
     claude-nixpkgs,
+    codex-nixpkgs,
     nixos-hardware,
     nvf,
     ...
@@ -44,6 +46,9 @@
       toolPkgs = import t3code-nixpkgs {
         inherit system;
       };
+      codexPkgs = import codex-nixpkgs {
+        inherit system;
+      };
       claudePkgs = import claude-nixpkgs {
         inherit system;
         config.allowUnfreePredicate = package: nixpkgs.lib.getName package == "claude-code";
@@ -53,7 +58,8 @@
         inherit system;
         specialArgs = {
           inherit hermesDomain nvf;
-          inherit (toolPkgs) t3code codex;
+          inherit (toolPkgs) t3code;
+          inherit (codexPkgs) codex;
           inherit (claudePkgs) claude-code;
         };
         modules =

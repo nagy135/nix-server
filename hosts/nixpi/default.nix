@@ -85,6 +85,7 @@ in {
       "docsheet"
       "omw"
       "spore"
+      "recipes"
     ];
   };
 

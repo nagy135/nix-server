@@ -85,6 +85,27 @@
       };
     };
 
+    # Photo recipe cards; static releases switch atomically.
+    virtualHosts."recipes.infiniter.tech" = {
+      enableACME = true;
+      forceSSL = true;
+      root = "/var/www/recipes/current";
+
+      locations."/" = {
+        tryFiles = "$uri $uri/ =404";
+        extraConfig = ''
+          add_header Cache-Control "no-cache";
+        '';
+      };
+
+      locations."^~ /assets/" = {
+        tryFiles = "$uri =404";
+        extraConfig = ''
+          add_header Cache-Control "public, max-age=31536000, immutable";
+        '';
+      };
+    };
+
     # Started manually with Docker Compose in ~/services/file-relay.
     virtualHosts."relay.infiniter.tech" = {
       enableACME = true;
@@ -168,5 +189,7 @@
     "d /var/www/fish/releases 0755 infiniter users -"
     "d /var/www/spore 0755 infiniter users -"
     "d /var/www/spore/releases 0755 infiniter users -"
+    "d /var/www/recipes 0755 infiniter users -"
+    "d /var/www/recipes/releases 0755 infiniter users -"
   ];
 }

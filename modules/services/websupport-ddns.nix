@@ -64,7 +64,8 @@
       records_path="/v1/user/self/zone/$zone/record"
       records_json="$(request GET "$records_path")"
 
-      for record in ${recordArgs}; do
+      records=(${recordArgs})
+      for record in "''${records[@]}"; do
         matching_records="$(jq -c --arg name "$record" '.items[] | select(.type == "A" and .name == $name)' <<< "$records_json")"
 
         if [[ -z "$matching_records" ]]; then

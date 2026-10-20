@@ -1,38 +1,53 @@
-# Sentinel and fleet uptime on nixpi
+# Sentinel and fleet uptime
 
 `https://status.infiniter.tech` serves Sentinel's native system metrics dashboard.
 The existing fleet availability dashboard is at `https://uptime.infiniter.tech`.
-Both use nginx, ACME certificates, and the existing Websupport DDNS updater.
+`https://hetzner-status.infiniter.tech` serves Hetzner's native Sentinel instance.
+All three dashboards use nginx, ACME certificates, and the Websupport DDNS updater.
 
 ## Sentinel
 
 - Source: `git@github.com:nagy135/sentinel.git`, branch `master`.
 - Checkout: `/home/infiniter/services/sentinel`.
-- Runtime: native Bun 1.4.2 pinned in `pkgs/sentinel-bun.nix`, `sentinel.service`, user `infiniter`.
+- Runtime: native Bun 1.4.2 (ARM64 on nixpi, x86_64 on Hetzner) pinned in `pkgs/sentinel-bun.nix`, `sentinel.service`, user `infiniter`.
 - Listener: `127.0.0.1:13333`; nginx terminates HTTPS.
 - Data: `/var/lib/sentinel/metrics.sqlite`, with SQLite WAL files, managed by `StateDirectory`.
 - Sampling: `SENTINEL_INTERVAL_MS=5000`, retaining all history.
 
-The native process reads nixpi's actual system information. No container is used
-for Sentinel. Authentication is deferred for this first deployment.
+Each native process reads its own host's actual system information. No container
+is used for Sentinel. The dashboard and metrics API require login; `/healthz`
+reports service health without authentication.
 
-Update from a published commit, build on nixpi, then restart:
+Both hosts load the same login from `/etc/sentinel/credentials.env` (root:root,
+mode `0600`), containing `SENTINEL_USERNAME` and `SENTINEL_PASSWORD`. Keep this file
+outside Git and the Nix store. Sessions are stored separately on each host in
+`/var/lib/sentinel/metrics.sqlite.auth.sqlite`.
+
+The Hetzner hostname is configured through `services.infiniter.sentinel.domain`.
+Importing Sentinel also adds its hostname to the local Websupport DNS updater's
+records. Both hosts run that updater on boot and every five minutes, using
+`/var/lib/websupport-ddns/credentials.env` (root:root, mode `0600`). Hetzner manages
+only `hetzner-status`; nixpi continues to manage `status` and its other records.
+Each updater sets its records to that machine's public IPv4 address. Credentials
+are provisioned privately on each host; Nix contains no API keys or passwords.
+
+Update from a published commit, build on the target host, then restart:
 
 ```sh
-# As infiniter on nixpi:
+# As infiniter on nixpi or Hetzner:
 cd ~/services/sentinel
 git pull --ff-only origin master
 bun install --frozen-lockfile
 bun run build
 bun run typecheck
 bun test
-# As root on nixpi:
+# As root on the same host:
 systemctl restart sentinel
 systemctl status sentinel --no-pager
-curl -fsS http://127.0.0.1:13333/api/metrics
+curl -fsS http://127.0.0.1:13333/healthz
 ```
 
-Check the API's `host.hostname`, recent `latest.timestamp`, and growing
+After signing in, check the API's `host.hostname`, recent `latest.timestamp`, and growing
 `storage.count`. The database is outside the checkout and survives rebuilds and
 service restarts. Local development remains `bun run dev`, listening on localhost.
 
@@ -57,5 +72,7 @@ nixos-rebuild switch --flake .#nixpi
 systemctl start websupport-ddns
 ```
 
-Verify both public HTTPS URLs, Sentinel's `/api/metrics`, and uptime's
-`/api/health` and `/api/status` after DNS/certificate issuance completes.
+For Hetzner, use `nixos-rebuild switch --flake .#hetzner` on that host and start its
+`websupport-ddns` service. Verify both Sentinel HTTPS URLs and their `/healthz`
+endpoints, authenticated `/api/metrics`, and uptime's `/api/health` and
+`/api/status` after DNS/certificate issuance completes.

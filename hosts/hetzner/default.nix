@@ -8,6 +8,8 @@
     ./networking.nix
     ./system.nix
     ./nginx.nix
+    ../../modules/services/sentinel.nix
+    ../../modules/services/websupport-ddns.nix
     (import ../../modules/opencode-projects.nix {
       projectPaths = [
         "/home/infiniter/services/vite-portfolio"
@@ -22,6 +24,12 @@
       gitUserEmail = "viktor.nagy1995@gmail.com";
     })
   ];
+
+  services.infiniter.sentinel.domain = "hetzner-status.infiniter.tech";
+  services.infiniter.websupportDDNS = {
+    enable = true;
+    zone = "infiniter.tech";
+  };
 
   # Allow the nixpi user to connect directly to this host.
   users.users.infiniter.openssh.authorizedKeys.keys = [

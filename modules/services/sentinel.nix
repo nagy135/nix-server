@@ -13,12 +13,15 @@ in {
       PORT = "13333";
       SENTINEL_INTERVAL_MS = "5000";
       SENTINEL_DB_PATH = "/var/lib/sentinel/metrics.sqlite";
+      SENTINEL_PUBLIC_URL = "https://status.infiniter.tech";
     };
     path = with pkgs; [sentinelBun coreutils procps util-linux iproute2 gnugrep gnused gawk];
     serviceConfig = {
       User = "infiniter";
       WorkingDirectory = "/home/infiniter/services/sentinel";
       ExecStart = "${sentinelBun}/bin/bun run scripts/start.ts";
+      # Created privately on nixpi (root:root, 0600); never put credentials in Nix.
+      EnvironmentFile = "/etc/sentinel/credentials.env";
       Restart = "on-failure";
       RestartSec = 5;
       StateDirectory = "sentinel";

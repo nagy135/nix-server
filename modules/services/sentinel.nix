@@ -43,6 +43,8 @@ in {
         UMask = "0077";
         NoNewPrivileges = true;
         ProtectSystem = "strict";
+        # SQLite spills larger history queries to temporary files.
+        PrivateTmp = true;
         ProtectHome = "read-only";
       };
     };

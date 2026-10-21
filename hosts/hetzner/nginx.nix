@@ -1,4 +1,8 @@
-{...}: let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   SSL = {
     enableACME = true;
     forceSSL = true;
@@ -29,10 +33,19 @@
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_set_header X-Forwarded-For $remote_addr;
   '';
-in {
-  services.nginx.enable = true;
-
-  services.nginx.virtualHosts = {
+  # Keep the full definitions so these projects can be re-enabled later.
+  disabledHosts = [
+    "drive.infiniter.tech"
+    "fit-api.infiniter.tech"
+    "fit.infiniter.tech"
+    "mongo.addyart.eu"
+    "n8n.infiniter.tech"
+    "netflix.infiniter.tech"
+    "ntfy.infiniter.tech"
+    "paste.infiniter.tech"
+    "photo.infiniter.tech"
+  ];
+  virtualHosts = {
     "photo.infiniter.tech" = proxyHost "photo.infiniter.tech" 2283;
     "paste.infiniter.tech" = proxyHost "paste.infiniter.tech" 2284;
 
@@ -213,6 +226,30 @@ in {
           client_max_body_size 2048M;
         '';
       };
+  };
+in {
+  services.nginx.enable = true;
+  services.nginx.virtualHosts = lib.filterAttrs (name: _: !(builtins.elem name disabledHosts)) virtualHosts;
+  services.infiniter.fleet.disabledVirtualHosts = lib.filterAttrs (name: _: builtins.elem name disabledHosts) virtualHosts;
+
+  # Mongo Express is an existing Compose container. Keep its definition and data,
+  # but stop it and prevent Docker from restarting it on subsequent boots.
+  systemd.services.fleet-retired-containers = {
+    description = "Keep retired fleet containers disabled";
+    wantedBy = ["multi-user.target"];
+    requires = ["docker.service"];
+    after = ["docker.service"];
+    path = [pkgs.docker];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      if docker container inspect addy-art-payload-mongo-express-1 >/dev/null 2>&1; then
+        docker update --restart=no addy-art-payload-mongo-express-1
+        docker stop addy-art-payload-mongo-express-1
+      fi
+    '';
   };
 
   fileSystems."/var/www/portfolio" = {

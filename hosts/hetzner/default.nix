@@ -11,6 +11,7 @@
     ../../modules/services/sentinel.nix
     ../../modules/services/websupport-ddns.nix
     (import ../../modules/opencode-projects.nix {
+      enable = false;
       projectPaths = [
         "/home/infiniter/services/vite-portfolio"
         "/home/infiniter/services/shift-distributor"

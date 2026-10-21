@@ -1,5 +1,6 @@
 {
   projectPaths,
+  enable ? true,
   domain ? "infiniter.tech",
   authDomain ? "auth.${domain}",
   basePort ? 4096,
@@ -29,11 +30,45 @@
     port = basePort + index;
     serviceName = "opencode-${name}";
     host = "edit-${name}.${domain}";
+    virtualHost = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."= /oauth2/auth" = {
+        proxyPass = "${oauth2ProxyAddress}/oauth2/auth";
+        extraConfig = ''
+          internal;
+          proxy_pass_request_body off;
+          proxy_set_header Content-Length "";
+          proxy_set_header X-Forwarded-Uri $request_uri;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
+        '';
+      };
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${toString port}";
+        proxyWebsockets = true;
+        extraConfig = ''
+          auth_request /oauth2/auth;
+          error_page 401 =302 https://${authDomain}/oauth2/start?rd=$scheme://$host$request_uri;
+
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-Host $host;
+          proxy_set_header X-Forwarded-Port $server_port;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+    };
   in {
     systemd.services.${serviceName} = {
+      inherit enable;
       description = "OpenCode for ${normalizedPath}";
       after = ["network.target"];
-      wantedBy = ["multi-user.target"];
+      wantedBy = lib.optionals enable ["multi-user.target"];
 
       environment = {
         HOME = home;
@@ -74,39 +109,8 @@
       '';
     };
 
-    services.nginx.virtualHosts.${host} = {
-      enableACME = true;
-      forceSSL = true;
-
-      locations."= /oauth2/auth" = {
-        proxyPass = "${oauth2ProxyAddress}/oauth2/auth";
-        extraConfig = ''
-          internal;
-          proxy_pass_request_body off;
-          proxy_set_header Content-Length "";
-          proxy_set_header X-Forwarded-Uri $request_uri;
-          proxy_set_header X-Forwarded-Host $host;
-          proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Auth-Request-Redirect $scheme://$host$request_uri;
-        '';
-      };
-
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString port}";
-        proxyWebsockets = true;
-        extraConfig = ''
-          auth_request /oauth2/auth;
-          error_page 401 =302 https://${authDomain}/oauth2/start?rd=$scheme://$host$request_uri;
-
-          proxy_set_header Host $host;
-          proxy_set_header X-Forwarded-Host $host;
-          proxy_set_header X-Forwarded-Port $server_port;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
-    };
+    services.nginx.virtualHosts = lib.optionalAttrs enable {${host} = virtualHost;};
+    services.infiniter.fleet.disabledVirtualHosts = lib.optionalAttrs (!enable) {${host} = virtualHost;};
   };
 
   generated = lib.imap0 mkProject projectPaths;

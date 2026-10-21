@@ -68,6 +68,7 @@
             home-manager.nixosModules.home-manager
             hermes-agent.nixosModules.default
             ./modules/users.nix
+            ./modules/services/fleet-monitoring.nix
             ./modules/system/login-banner.nix
             ./modules/services/hermes.nix
             {
@@ -95,7 +96,7 @@
     nixosConfigurations = {
       nixzero = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
-        modules = [./hosts/nixzero];
+        modules = [./hosts/nixzero ./modules/services/fleet-monitoring.nix];
       };
 
       nixpi = mkHost {

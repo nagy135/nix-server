@@ -60,7 +60,10 @@
           inherit hermesDomain nvf;
           inherit (toolPkgs) t3code;
           inherit (codexPkgs) codex;
-          inherit (claudePkgs) claude-code;
+          # Keep the official release current when the nixpkgs manifest lags.
+          claude-code = claudePkgs.claude-code.override {
+            manifest = nixpkgs.lib.importJSON ./pkgs/claude-code-manifest.zst.json;
+          };
         };
         modules =
           modules

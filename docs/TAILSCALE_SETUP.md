@@ -319,3 +319,28 @@ ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=15 \
 
 Then open `http://127.0.0.1:13773`. The regular desktop connection does not need
 this manual tunnel. Stop the temporary tunnel with Ctrl-C when finished.
+
+### T3 Code 0.1.1 upgrade
+
+The Nix-managed service was upgraded from 0.1.0 to 0.1.1 on 2026-10-21
+using the official Linux/ARM64 release and its published SHA-256.
+The flake inputs were unchanged, and the system closure differs only in
+the T3 Code package. The system build, all host and Zero SD image derivation
+evaluations, and `nix flake check --all-systems --no-build --no-write-lock-file`
+passed.
+
+A full userdata backup, made while the service was stopped, is stored at
+`/var/backups/t3code/userdata-before-0.1.1-20261021-223415.tar.gz`.
+The previous system path, environment-ID checksum, and original project and
+thread IDs are also recorded under `/var/backups/t3code`.
+
+The packaged server reports 0.1.1, the service is active and enabled at boot,
+HTTP returns 200, and it listens only on `127.0.0.1:3773`. Both live databases
+pass `PRAGMA quick_check`; the environment ID, 9 project IDs, and 26 thread IDs
+are preserved.
+
+During activation, the desktop's SSH reconnect started the downloaded 0.1.1
+helper while the system service was stopped. Its userdata ownership lock
+prevented the system service from starting. Stopping that helper and starting
+`t3code.service` restored the Nix-managed server. For future upgrades, keep the
+desktop connection disconnected during the backup and service switch.

@@ -24,6 +24,24 @@
   oauth2ProxyAddress = "http://127.0.0.1:4180";
   opencodeInstructionsPath = "/etc/opencode-service-instructions.md";
   opencodeConfigPath = "/etc/opencode-service-config.json";
+  authVirtualHost = {
+    enableACME = true;
+    forceSSL = true;
+
+    locations."/oauth2/" = {
+      proxyPass = oauth2ProxyAddress;
+      extraConfig = ''
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      '';
+    };
+
+    locations."/".extraConfig = ''
+      return 404;
+    '';
+  };
   mkProject = index: path: let
     normalizedPath = lib.removeSuffix "/" path;
     name = lib.last (lib.splitString "/" normalizedPath);
@@ -119,7 +137,7 @@ in
     [
       {
         services.oauth2-proxy = {
-          enable = true;
+          inherit enable;
           provider = "github";
           reverseProxy = true;
           trustedProxyIP = ["127.0.0.1" "::1"];
@@ -141,6 +159,7 @@ in
         # NixOS now loads OAuth secrets at runtime. Keep the existing URL-safe
         # base64 normalization without embedding secrets in the generated service configuration.
         systemd.services.oauth2-proxy = {
+          inherit enable;
           serviceConfig = {
             RuntimeDirectory = "oauth2-proxy";
             RuntimeDirectoryMode = "0700";
@@ -161,24 +180,8 @@ in
           '';
         };
 
-        services.nginx.virtualHosts.${authDomain} = {
-          enableACME = true;
-          forceSSL = true;
-
-          locations."/oauth2/" = {
-            proxyPass = oauth2ProxyAddress;
-            extraConfig = ''
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
-              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
-            '';
-          };
-
-          locations."/".extraConfig = ''
-            return 404;
-          '';
-        };
+        services.nginx.virtualHosts = lib.optionalAttrs enable {${authDomain} = authVirtualHost;};
+        services.infiniter.fleet.disabledVirtualHosts = lib.optionalAttrs (!enable) {${authDomain} = authVirtualHost;};
 
         environment.etc."opencode-gitconfig".text = ''
           [user]

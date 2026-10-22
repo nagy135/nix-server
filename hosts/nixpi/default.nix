@@ -24,6 +24,7 @@ in {
     ../../modules/services/system-status.nix
     ../../modules/services/websupport-ddns.nix
     ../../modules/services/fitness-ai.nix
+    ../../modules/services/wiki-around-me.nix
   ];
 
   # Dedicated Zero build key: Nix store protocol only, without shell access.

@@ -12,6 +12,13 @@ in {
   system.stateVersion = "25.11";
   time.timeZone = "Europe/Berlin";
 
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+  services.journald.extraConfig = "SystemMaxUse=512M";
+
   imports = [
     ./hardware.nix
     ./networking.nix

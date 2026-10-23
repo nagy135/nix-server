@@ -344,3 +344,26 @@ helper while the system service was stopped. Its userdata ownership lock
 prevented the system service from starting. Stopping that helper and starting
 `t3code.service` restored the Nix-managed server. For future upgrades, keep the
 desktop connection disconnected during the backup and service switch.
+
+### T3 Code 0.1.2 upgrade
+
+The Nix-managed service was upgraded to 0.1.2 on 2026-10-23 using the
+official Linux/ARM64 archive and its published SHA-256. Flake inputs are
+unchanged. The release executable initially segfaulted on nixpi's 16 KiB-page
+kernel because Node 26.12.1's SEA injector produced incompatible ELF metadata
+segments ([upstream issue](https://github.com/pingdotgg/t3code/issues/23433)).
+The package now relocates those read-only metadata mappings, validates LOAD
+alignment and page separation at 64 KiB, and checks the packaged version and
+help commands during the build. Remove the workaround once the release uses
+a compatible injector; the proposed upstream fix is
+[PR 23443](https://github.com/pingdotgg/t3code/pull/23443).
+
+A stopped-service userdata backup and checksum, previous system path,
+environment-ID checksum, and project/thread ID snapshots are stored in
+`/var/backups/t3code/before-0.1.2-20261023-103439`.
+All host and Zero SD image derivation evaluations, the flake check, and the
+native system build passed. An isolated server returned HTTP 200 before
+activation. After activation, the packaged server reports 0.1.2, the service
+is active and enabled, and HTTP returns 200 on `127.0.0.1:3773`.
+Both databases pass `PRAGMA quick_check`; the environment ID, 9 project IDs,
+and 26 thread IDs are preserved. T3 Connect reports a connected QUIC tunnel.

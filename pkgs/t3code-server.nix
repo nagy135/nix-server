@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   '';
 
   # Node 26.12.1's SEA injector places metadata on 4 KiB boundaries.
-  # Repair it after autoPatchelf so nixpi's 16 KiB kernel can load the server.
+  # Repair the metadata so nixpi's 16 KiB kernel can load the server.
   # Upstream: https://github.com/pingdotgg/t3code/issues/23433
   postFixup = ''
     python3 ${./patch-t3code-elf.py} $out/libexec/t3code/t3

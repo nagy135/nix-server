@@ -95,6 +95,7 @@ in {
       "omw"
       "spore"
       "recipes"
+      "guitar"
     ];
   };
 

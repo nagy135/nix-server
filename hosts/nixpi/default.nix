@@ -30,6 +30,7 @@ in {
     ../../modules/services/agent-office.nix
     ../../modules/services/system-status.nix
     ../../modules/services/websupport-ddns.nix
+    ../../modules/services/html-sharing.nix
     ../../modules/services/fitness-ai.nix
     ../../modules/services/wiki-around-me.nix
   ];
@@ -79,6 +80,11 @@ in {
 
   services.infiniter.systemStatus.enable = true;
 
+  services.infiniter.htmlSharing = {
+    enable = true;
+    directory = "/var/www/html-sharing";
+  };
+
   services.infiniter.websupportDDNS = {
     enable = true;
     zone = "infiniter.tech";
@@ -96,6 +102,7 @@ in {
       "spore"
       "recipes"
       "guitar"
+      "html"
     ];
   };
 

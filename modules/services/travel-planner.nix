@@ -1,6 +1,4 @@
-{pkgs, codex, ...}: let
-  python = pkgs.python3.withPackages (p: [p.jinja2 p.jsonschema]);
-in {
+{pkgs, codex, ...}: {
   users.groups.travel = {};
   users.users.travel = {
     isSystemUser = true;
@@ -20,16 +18,13 @@ in {
       TRAVEL_DB = "/var/lib/travel/travel.sqlite";
       TRAVEL_BIND = "127.0.0.1:13009";
       TRAVEL_ORIGIN = "https://travel.infiniter.tech";
-      TRAVEL_PYTHON = "${python}/bin/python";
       TRAVEL_CODEX = "${codex}/bin/codex";
-      PYTHONDONTWRITEBYTECODE = "1";
     };
     serviceConfig = {
       User = "travel";
       Group = "travel";
       WorkingDirectory = "/var/www/travel/current";
       ExecStart = "/var/www/travel/current/target/release/travel-server serve";
-      EnvironmentFile = "/var/lib/travel/editor.env";
       StateDirectory = "travel";
       StateDirectoryMode = "0700";
       Restart = "on-failure";
@@ -88,6 +83,5 @@ in {
   systemd.tmpfiles.rules = [
     "d /var/www/travel 0755 infiniter users -"
     "d /var/www/travel/releases 0755 infiniter users -"
-    "L+ /var/www/travel/python - - - - ${python}/bin/python"
   ];
 }

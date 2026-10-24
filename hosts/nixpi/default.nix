@@ -33,6 +33,7 @@ in {
     ../../modules/services/html-sharing.nix
     ../../modules/services/fitness-ai.nix
     ../../modules/services/wiki-around-me.nix
+    ../../modules/services/travel-planner.nix
   ];
 
   # Dedicated Zero build key: Nix store protocol only, without shell access.

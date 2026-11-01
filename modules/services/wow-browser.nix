@@ -43,6 +43,9 @@
     forceSSL = true;
     root = "/var/www/wow/current";
 
+    # The bundled backend is executed by systemd, not served as a game asset.
+    locations."^~ /api/".return = "404";
+
     locations."/" = {
       tryFiles = "$uri $uri/ =404";
       extraConfig = ''

@@ -8,6 +8,7 @@
     ./networking.nix
     ./system.nix
     ./nginx.nix
+    ../../modules/services/wow-browser.nix
     ../../modules/services/sentinel.nix
     ../../modules/services/websupport-ddns.nix
     (import ../../modules/opencode-projects.nix {

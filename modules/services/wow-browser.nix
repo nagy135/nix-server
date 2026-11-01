@@ -9,6 +9,8 @@
       HOST = "127.0.0.1";
       PORT = "8787";
       ALLOWED_ORIGINS = "https://wow.infiniter.tech";
+      TURN_SECRET_FILE = "/run/credentials/wow-api.service/turn-secret";
+      TURN_URLS = "stun:wow-api.infiniter.tech:3478,turn:wow-api.infiniter.tech:3478?transport=udp,turn:wow-api.infiniter.tech:3478?transport=tcp";
     };
     serviceConfig = {
       User = "infiniter";
@@ -24,7 +26,54 @@
       RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
       MemoryMax = "512M";
       UMask = "0027";
+      LoadCredential = "turn-secret:/var/lib/wow-voice/turn-secret";
     };
+  };
+
+  # WebRTC relay for lobby voice when the two players cannot connect directly.
+  # The root-owned secret is provisioned on the host, never stored in Git/Nix.
+  services.coturn = {
+    enable = true;
+    realm = "wow-api.infiniter.tech";
+    listening-ips = ["91.99.204.136"];
+    relay-ips = ["91.99.204.136"];
+    use-auth-secret = true;
+    static-auth-secret-file = "/run/credentials/coturn.service/turn-secret";
+    no-cli = true;
+    no-tls = true;
+    no-dtls = true;
+    no-tcp-relay = true;
+    min-port = 49160;
+    max-port = 49559;
+    extraConfig = ''
+      fingerprint
+      no-multicast-peers
+      user-quota=4
+      total-quota=400
+      max-bps=128000
+      max-allocate-lifetime=3600
+      denied-peer-ip=0.0.0.0-0.255.255.255
+      denied-peer-ip=10.0.0.0-10.255.255.255
+      denied-peer-ip=100.64.0.0-100.127.255.255
+      denied-peer-ip=127.0.0.0-127.255.255.255
+      denied-peer-ip=169.254.0.0-169.254.255.255
+      denied-peer-ip=172.16.0.0-172.31.255.255
+      denied-peer-ip=192.168.0.0-192.168.255.255
+      denied-peer-ip=::1
+      denied-peer-ip=fc00::-fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+      denied-peer-ip=fe80::-febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+    '';
+  };
+  systemd.services.coturn.serviceConfig.LoadCredential = "turn-secret:/var/lib/wow-voice/turn-secret";
+  networking.firewall = {
+    allowedTCPPorts = [3478];
+    allowedUDPPorts = [3478];
+    allowedUDPPortRanges = [
+      {
+        from = 49160;
+        to = 49559;
+      }
+    ];
   };
   services.nginx.virtualHosts."wow-api.infiniter.tech" = {
     enableACME = true;

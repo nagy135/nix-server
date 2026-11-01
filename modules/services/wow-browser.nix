@@ -6,6 +6,7 @@
     unitConfig.ConditionPathExists = "/var/www/wow/current/api/server.mjs";
     environment = {
       NODE_ENV = "production";
+      WOW_DATABASE_PATH = "/var/lib/wow-api/leaderboard.sqlite";
       HOST = "127.0.0.1";
       PORT = "8787";
       ALLOWED_ORIGINS = "https://wow.infiniter.tech";
@@ -25,7 +26,10 @@
       ProtectSystem = "strict";
       RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
       MemoryMax = "512M";
-      UMask = "0027";
+      StateDirectory = "wow-api";
+      StateDirectoryMode = "0700";
+      ReadWritePaths = ["/var/lib/wow-api"];
+      UMask = "0077";
       LoadCredential = "turn-secret:/var/lib/wow-voice/turn-secret";
     };
   };

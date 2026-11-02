@@ -104,6 +104,7 @@ in {
       "spore"
       "recipes"
       "guitar"
+      "timer"
       "html"
     ];
   };

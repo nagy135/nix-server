@@ -27,6 +27,15 @@
     })
   ];
 
+  # Enroll once with `sudo tailscale up --netfilter-mode=off --ssh=false --accept-routes=false`.
+  # Keep NixOS in charge of filtering and use the existing OpenSSH service.
+  services.tailscale = {
+    enable = true;
+    openFirewall = false;
+    useRoutingFeatures = "none";
+    extraSetFlags = ["--netfilter-mode=off" "--ssh=false" "--accept-routes=false"];
+  };
+
   services.infiniter.sentinel.domain = "hetzner-status.infiniter.tech";
   services.infiniter.websupportDDNS = {
     enable = true;

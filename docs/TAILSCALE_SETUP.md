@@ -1,10 +1,24 @@
 # SSH to nixpi through Tailscale
 
 This repository uses `.#nixpi` for the Raspberry Pi 5 and `.#hetzner` for the
-Hetzner server; `.#nixzero` selects the Zero 2 W. Tailscale is enabled on both
-Pis. On nixpi, OpenSSH and the existing
+Hetzner server; `.#nixzero` selects the Zero 2 W. Tailscale is enabled on all
+three hosts. On nixpi, OpenSSH and the existing
 authorized keys come from `modules/system/base.nix` and `modules/users.nix`.
 Use the normal `infiniter` account for SSH.
+
+## Hetzner
+
+Deploy `.#hetzner`, then enroll the server interactively once:
+
+```sh
+sudo tailscale up --netfilter-mode=off --ssh=false --accept-routes=false
+```
+
+Complete sign-in with the same tailnet as the Mac and Pis. Enrollment is kept
+in `/var/lib/tailscale`; no auth key is stored in this repository. Hetzner uses
+the same filtering settings as the Pis below, with the existing OpenSSH service
+and no new public firewall ports. Verify with `tailscale status` and
+`tailscale ip -4`.
 
 ## Configuration and enrollment
 

@@ -23,7 +23,12 @@
   services.infiniter.websupportDDNS.records = ["uptime"];
   systemd.services.uptime-dashboard-backup = {
     description = "Back up the fleet status SQLite database";
-    serviceConfig = { Type = "oneshot"; UMask = "0077"; };
+    serviceConfig = {
+      Type = "oneshot";
+      UMask = "0077";
+      # A busy live database can make SQLite's backup restart indefinitely.
+      TimeoutStartSec = "5min";
+    };
     path = [pkgs.sqlite pkgs.coreutils pkgs.findutils pkgs.gzip];
     script = ''
       set -eu

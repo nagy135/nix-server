@@ -1,4 +1,15 @@
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
+  assertions = [
+    {
+      assertion = config.networking.hostName == "hetzner";
+      message = "WoW runtime and DNS belong on Hetzner; import wow-browser.nix only on hetzner.";
+    }
+  ];
+
   systemd.services.wow-api = {
     description = "WoW browser authoritative arena API";
     wantedBy = ["multi-user.target"];

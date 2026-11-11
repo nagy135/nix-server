@@ -8,6 +8,7 @@
   gh,
   openssh,
   python3,
+  vulkan-loader,
 }:
 stdenv.mkDerivation rec {
   pname = "t3code-server";
@@ -19,7 +20,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [autoPatchelfHook makeWrapper python3];
-  buildInputs = [stdenv.cc.cc.lib];
+  buildInputs = [stdenv.cc.cc.lib vulkan-loader];
   dontBuild = true;
   # The standalone executable contains the bundled application payload.
   dontStrip = true;
@@ -30,6 +31,7 @@ stdenv.mkDerivation rec {
     cp -r . $out/libexec/t3code/
     # NixOS uses the bundled glibc build, not these optional musl addons.
     rm -f $out/libexec/t3code/node_modules/@msgpackr-extract/msgpackr-extract-linux-arm64/*.musl.node
+    rm -rf $out/libexec/t3code/node_modules/@koromix/koffi-linux-arm64/musl_arm64
     makeWrapper $out/libexec/t3code/t3 $out/bin/t3 \
       --prefix PATH : ${lib.makeBinPath [git gh openssh]}
     runHook postInstall

@@ -11,11 +11,11 @@
 }:
 stdenv.mkDerivation rec {
   pname = "t3code-server";
-  version = "0.1.3";
+  version = "0.1.8";
 
   src = fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/t3-${version}-linux-arm64.tar.gz";
-    sha256 = "56df87ccb37d46a0f65374b387998a08aa73f123fd8c00c1139c8b4c7bd439d5";
+    sha256 = "2bffbf608eef736c5c35e3431a7e5261d0c909e33d8a8feb83ef26a3747cf8f4";
   };
 
   nativeBuildInputs = [autoPatchelfHook makeWrapper python3];

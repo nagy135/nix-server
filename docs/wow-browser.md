@@ -124,3 +124,14 @@ names. On nixpi, verify the source checkout's remote and branch, inspect
 `docker ps -a` and system/user unit inventories for any WoW runtime, and keep
 that checkout source-only. Do not read or print credential or database contents
 as part of these checks.
+
+## Administrator credentials
+
+The gitignored `/home/infiniter/services/wow-browser/.env` in the game source
+checkout holds `ADMIN_USERNAME` and `ADMIN_PASSWORD`. Keep it owned by
+`infiniter:users`, mode `0600`. The service manager loads it through
+`EnvironmentFile` before applying `ProtectHome`, so no home access exemption is
+needed and secrets never enter immutable releases or the Nix store. Edit with
+`vim ~/services/wow-browser/.env` as infiniter, then restart `wow-api.service`.
+Do not replace it during deployment. Runtime session hashes and the leaderboard
+stay in `/var/lib/wow-api`.

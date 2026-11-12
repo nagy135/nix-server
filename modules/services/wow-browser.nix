@@ -28,6 +28,8 @@
       User = "infiniter";
       Group = "users";
       WorkingDirectory = "/var/www/wow/current";
+      # The manager reads this before ProtectHome is applied to the API.
+      EnvironmentFile = "/home/infiniter/services/wow-browser/.env";
       ExecStart = "${pkgs.nodejs_24}/bin/node /var/www/wow/current/api/server.mjs";
       Restart = "on-failure";
       RestartSec = 3;
